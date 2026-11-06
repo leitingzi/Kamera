@@ -1,3 +1,7 @@
+fun cameraKotlinGreeting(): String = "Hello from a Kotlin function!"
+
+internal expect fun runPlatformInteropDemo()
+
 fun main() {
-    println("Hello from CameraK Web!")
+    runPlatformInteropDemo()
 }

@@ -1,4 +1,4 @@
-name: Deploy Documentation
+name: Deploy Documentation and CameraK Web Demo
 
 on:
   push:
@@ -7,21 +7,57 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: actions/setup-python@v5
         with:
           python-version: 3.x
-          
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
       - name: Install dependencies
         run: |
           pip install mkdocs-material==9.5.18
-          
-      - name: Deploy docs
-        run: mkdocs gh-deploy --force
+
+      - name: Build Kotlin/JS web demo
+        run: ./gradlew --no-daemon :cameraK-web:jsBrowserDistribution
+
+      - name: Build documentation and assemble Pages site
+        run: |
+          mkdocs build --site-dir site
+          mkdir -p site/cameraK-web
+          cp -R cameraK-web/build/dist/js/productionExecutable/. site/cameraK-web/
+          touch site/.nojekyll
+          test -s site/index.html
+          test -s site/cameraK-web/index.html
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -15,4 +15,10 @@ kotlin {
         browser()
         binaries.executable()
     }
+
+    sourceSets {
+        webMain.dependencies {
+            implementation(libs.kotlinx.browser)
+        }
+    }
 }

@@ -1,8 +1,9 @@
-internal actual fun runPlatformInteropDemo() {
+internal actual fun runPlatformInteropDemo(): CameraWebDemoResult {
     val browser = js("globalThis")
     browser.cameraKotlinGreeting = { cameraKotlinGreeting() }
 
-    val result = browser.cameraKWebExample()
-    browser.document.getElementById("output").textContent = result
-    browser.console.log(result)
+    return CameraWebDemoResult(
+        interopMessage = browser.cameraKWebExample() as String,
+        isCameraSupported = browser.cameraKWebIsCameraSupported() as Boolean,
+    )
 }

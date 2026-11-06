@@ -11,6 +11,16 @@ internal actual fun runPlatformInteropDemo(): CameraWebDemoResult {
     )
 }
 
-internal actual fun isCameraMediaDevicesSupported(): Boolean = js(
-    "Boolean(navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function' && typeof navigator.mediaDevices.enumerateDevices === 'function')",
+internal actual fun isCameraSecureContext(): Boolean = js("globalThis.isSecureContext === true")
+
+internal actual fun hasMediaDevicesApi(): Boolean = js(
+    "typeof navigator !== 'undefined' && navigator.mediaDevices != null",
+)
+
+internal actual fun hasGetUserMediaApi(): Boolean = js(
+    "typeof navigator !== 'undefined' && navigator.mediaDevices != null && typeof navigator.mediaDevices.getUserMedia === 'function'",
+)
+
+internal actual fun hasEnumerateDevicesApi(): Boolean = js(
+    "typeof navigator !== 'undefined' && navigator.mediaDevices != null && typeof navigator.mediaDevices.enumerateDevices === 'function'",
 )

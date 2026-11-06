@@ -2,6 +2,8 @@
 
 **Modern camera SDK for Kotlin Multiplatform** -- Android, iOS, and Desktop with a unified API.
 
+Try the [CameraK Web demo](https://leitingzi.github.io/Kamera/cameraK-web/).
+
 ## Get Started in 60 Seconds
 
 ```kotlin

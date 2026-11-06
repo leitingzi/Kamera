@@ -11,4 +11,5 @@ enum class BrowserCameraErrorCode {
     PLAYBACK_FAILED,
     CAPTURE_FAILED,
     RECORDING_FAILED,
+    UNKNOWN,
 }

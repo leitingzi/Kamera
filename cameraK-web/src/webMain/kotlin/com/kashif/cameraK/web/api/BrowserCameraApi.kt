@@ -3,6 +3,7 @@ package com.kashif.cameraK.web.api
 import com.kashif.cameraK.web.device.BrowserCameraOptions
 import com.kashif.cameraK.web.device.BrowserCameraSession
 import com.kashif.cameraK.web.device.BrowserCameraSubscription
+import com.kashif.cameraK.web.device.BrowserCameraSupport
 import com.kashif.cameraK.web.device.CameraDeviceInfo
 import com.kashif.cameraK.web.photo.BrowserPhotoCapture
 import com.kashif.cameraK.web.preview.BrowserCameraPreview
@@ -16,8 +17,11 @@ import com.kashif.cameraK.web.recording.BrowserVideoRecordingOptions
  * session, preview, photo, and recording boundaries for a later core adapter.
  */
 interface BrowserCameraApi {
-    /** Whether the current browser context exposes the required media-device APIs. */
-    val isSupported: Boolean
+    /** Availability details for secure context and required media-device APIs. */
+    val support: BrowserCameraSupport
+
+    /** Whether all camera prerequisites are available in the current browser context. */
+    val isSupported: Boolean get() = support.isSupported
 
     /**
      * Enumerates video input devices. Before permission is granted, labels and non-default devices

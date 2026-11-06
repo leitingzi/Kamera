@@ -1,3 +1,6 @@
+package com.kashif.cameraK.web.interop
+
+import com.kashif.cameraK.web.cameraKotlinGreeting
 import kotlin.JsFun
 import kotlin.js.ExperimentalWasmJsInterop
 

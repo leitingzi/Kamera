@@ -1,3 +1,7 @@
+package com.kashif.cameraK.web
+
+import com.kashif.cameraK.web.device.BrowserMediaDevices
+import com.kashif.cameraK.web.interop.runPlatformInteropDemo
 import kotlinx.browser.document
 
 fun cameraKotlinGreeting(): String = "Hello from a Kotlin function!"
@@ -7,10 +11,6 @@ fun cameraSupportMessage(isSupported: Boolean): String = if (isSupported) {
 } else {
     "Camera API is not supported. Use a secure context (HTTPS or localhost)."
 }
-
-internal data class CameraWebDemoResult(val interopMessage: String)
-
-internal expect fun runPlatformInteropDemo(): CameraWebDemoResult
 
 fun main() {
     val result = runPlatformInteropDemo()

@@ -1,3 +1,7 @@
+package com.kashif.cameraK.web.interop
+
+import com.kashif.cameraK.web.cameraKotlinGreeting
+
 internal actual fun runPlatformInteropDemo(): CameraWebDemoResult {
     val browser = js("globalThis")
     browser.cameraKotlinGreeting = { cameraKotlinGreeting() }

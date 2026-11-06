@@ -4,6 +4,9 @@ internal actual fun runPlatformInteropDemo(): CameraWebDemoResult {
 
     return CameraWebDemoResult(
         interopMessage = browser.cameraKWebExample() as String,
-        isCameraSupported = browser.cameraKWebIsCameraSupported() as Boolean,
     )
 }
+
+internal actual fun isCameraMediaDevicesSupported(): Boolean = js(
+    "Boolean(navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function' && typeof navigator.mediaDevices.enumerateDevices === 'function')",
+)

@@ -1,5 +1,4 @@
 import kotlinx.browser.document
-import kotlinx.browser.window
 
 fun cameraKotlinGreeting(): String = "Hello from a Kotlin function!"
 
@@ -9,44 +8,42 @@ fun cameraSupportMessage(isSupported: Boolean): String = if (isSupported) {
     "Camera API is not supported. Use a secure context (HTTPS or localhost)."
 }
 
-internal data class CameraWebDemoResult(val interopMessage: String, val isCameraSupported: Boolean)
+internal data class CameraWebDemoResult(val interopMessage: String)
 
 internal expect fun runPlatformInteropDemo(): CameraWebDemoResult
 
 fun main() {
     val result = runPlatformInteropDemo()
-    val cameraMessage = cameraSupportMessage(result.isCameraSupported)
+    val browserMediaDevices = BrowserMediaDevices()
+    val cameraMessage = cameraSupportMessage(browserMediaDevices.isCameraSupported)
 
     document.getElementById("output")?.textContent = result.interopMessage
     document.getElementById("camera-support")?.textContent = cameraMessage
-    if (result.isCameraSupported) {
-        val mediaDevices = BrowserMediaDevices(window.navigator.mediaDevices)
-        val constraints = mediaDevices.getSupportedConstraints()
-        val constraintsMessage =
-            if (constraints.isEmpty()) {
-                "No supported media constraints were reported."
-            } else {
-                constraints.joinToString(separator = "\n")
-            }
-        document.getElementById("supported-constraints")?.textContent = constraintsMessage
-        println("Supported media constraints:\n$constraintsMessage")
 
-        mediaDevices.enumerateDevices(
+    if (browserMediaDevices.isCameraSupported) {
+        browserMediaDevices.getCameraDevices(
             onSuccess = { devices ->
-                val message = if (devices.isEmpty()) "No media devices are available." else devices.joinToString("\n")
+                val message =
+                    if (devices.isEmpty()) {
+                        "No cameras are available. Grant camera permission and try again if a camera is connected."
+                    } else {
+                        devices.mapIndexed { index, device ->
+                            val label = device.label.ifBlank { "Camera label hidden until permission is granted" }
+                            "${index + 1}. $label"
+                        }.joinToString("\n")
+                    }
                 document.getElementById("media-devices")?.textContent = message
-                println("Available media devices:\n$message")
+                println("Available cameras:\n$message")
             },
             onFailure = { error ->
-                val message = "Could not enumerate media devices: $error"
+                val message = "Could not enumerate cameras: $error"
                 document.getElementById("media-devices")?.textContent = message
                 println("ERROR: $message")
             },
         )
     } else {
-        val message = "Media device enumeration is not supported in this browser context."
+        val message = "Camera access is not supported in this browser context."
         document.getElementById("media-devices")?.textContent = message
-        document.getElementById("supported-constraints")?.textContent = message
         println(message)
     }
 

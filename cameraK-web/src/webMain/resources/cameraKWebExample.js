@@ -6,6 +6,8 @@ globalThis.cameraKWebExample = function () {
 globalThis.cameraKWebIsCameraSupported = function () {
     return Boolean(
         navigator.mediaDevices &&
-        typeof navigator.mediaDevices.getUserMedia === "function"
+        typeof navigator.mediaDevices.getUserMedia === "function" &&
+        typeof navigator.mediaDevices.enumerateDevices === "function" &&
+        typeof navigator.mediaDevices.getSupportedConstraints === "function"
     );
 };

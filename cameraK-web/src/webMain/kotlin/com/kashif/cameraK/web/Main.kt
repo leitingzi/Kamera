@@ -8,10 +8,12 @@ import com.kashif.cameraK.web.device.BrowserCameraSubscription
 import com.kashif.cameraK.web.device.BrowserMediaDevices
 import com.kashif.cameraK.web.device.CameraDeviceInfo
 import com.kashif.cameraK.web.interop.runPlatformInteropDemo
+import com.kashif.cameraK.web.preview.BrowserCameraPreview
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.HTMLOptionElement
 import org.w3c.dom.HTMLSelectElement
+import org.w3c.dom.HTMLVideoElement
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -24,9 +26,14 @@ fun main() {
     val support = browserMediaDevices.support
     val cameraMessage = support.unsupportedReason ?: "Camera API is supported by this browser."
     val cameraSelect = document.getElementById("camera-select") as? HTMLSelectElement
+    val cameraVideo = document.getElementById("camera-preview") as? HTMLVideoElement
     val cameraSessionMessage = document.getElementById("camera-session")
     var session: BrowserCameraSession? = null
     var deviceChanges: BrowserCameraSubscription? = null
+    val preview = BrowserCameraPreview.create()
+    preview.observePlaybackErrors { error ->
+        cameraSessionMessage?.textContent = "Preview playback failed: ${error.message}"
+    }
 
     document.getElementById("output")?.textContent = result.interopMessage
     document.getElementById("camera-support")?.textContent = cameraMessage
@@ -61,6 +68,7 @@ fun main() {
         "pagehide",
         {
             deviceChanges?.cancel()
+            preview.close()
             session?.let { activeSession -> launchCameraOperation({ activeSession.close() }, {}) }
         },
         options = true,
@@ -81,10 +89,13 @@ fun main() {
             }
         }
         launchCameraOperation(
-            block = { activeSession.start() },
+            block = {
+                activeSession.start()
+                cameraVideo?.let { preview.attach(activeSession, it) }
+            },
             onResult = { error ->
                 cameraSessionMessage?.textContent =
-                    error?.let { "Camera failed: ${it.message}" } ?: "Camera started."
+                    error?.let { "Camera or preview failed: ${it.message}" } ?: "Camera started and preview is playing."
             },
         )
     }

@@ -27,6 +27,9 @@ interface BrowserCameraSession {
     /** Active video track, or null until started and after it is stopped or closed. */
     val videoTrack: MediaStreamTrack?
 
+    /** Browser-reported support for standard constraints. Zoom and torch may also be device-specific. */
+    val supportedConstraints: BrowserCameraSupportedConstraints
+
     /** Observes state changes. Cancel the returned subscription when the listener is no longer needed. */
     fun observeState(listener: (BrowserCameraSessionState) -> Unit): BrowserCameraSubscription
 
@@ -38,6 +41,18 @@ interface BrowserCameraSession {
 
     /** Switches to another device or facing preference, preserving the current stream on failure. */
     suspend fun switchCamera(options: BrowserCameraOptions)
+
+    /** Reads the active camera's reported capabilities. Requires an active video track. */
+    fun readCapabilities(): BrowserCameraCapabilities
+
+    /** Reads the active camera's effective settings. Requires an active video track. */
+    fun readSettings(): BrowserCameraSettings
+
+    /** Reads the constraints currently applied to the active track. Requires an active video track. */
+    fun readConstraints(): BrowserCameraAppliedConstraints
+
+    /** Applies supported dynamic constraints; [BrowserNumericConstraint.ideal] is preferred by default. */
+    suspend fun applyConstraints(constraints: BrowserCameraConstraintSet)
 
     /** Stops active camera tracks. Safe to call repeatedly. */
     suspend fun stop()

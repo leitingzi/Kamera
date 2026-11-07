@@ -13,4 +13,6 @@ sealed interface BrowserCameraSessionEvent {
     data class DevicesChanged(val devices: List<CameraDeviceInfo>) : BrowserCameraSessionEvent
 
     data class DeviceRefreshFailed(val error: BrowserCameraException) : BrowserCameraSessionEvent
+
+    data class ConstraintsChanged(val settings: BrowserCameraSettings) : BrowserCameraSessionEvent
 }

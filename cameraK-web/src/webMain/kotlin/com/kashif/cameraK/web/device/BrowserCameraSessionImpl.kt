@@ -31,6 +31,17 @@ private suspend fun Promise<MediaStream>.awaitCameraStream(): MediaStream = susp
 }
 
 @OptIn(ExperimentalWasmJsInterop::class)
+private suspend fun Promise<Nothing?>.awaitCameraConstraints(): Unit = suspendCoroutine { continuation ->
+    then {
+        continuation.resume(Unit)
+        null
+    }.catch { error ->
+        continuation.resumeWithException(error.toBrowserCameraException())
+        null
+    }
+}
+
+@OptIn(ExperimentalWasmJsInterop::class)
 internal class BrowserCameraSessionImpl(initialOptions: BrowserCameraOptions) : BrowserCameraSession {
     private val devices = BrowserMediaDevices()
     private val support = devices.support
@@ -104,6 +115,36 @@ internal class BrowserCameraSessionImpl(initialOptions: BrowserCameraOptions) : 
             stopTracks(previousStream)
             setState(BrowserCameraSessionState.Running(currentDevice))
             refreshDevices()
+        } finally {
+            finishOperation(requestId)
+        }
+    }
+
+    override val supportedConstraints: BrowserCameraSupportedConstraints
+        get() = currentTrack?.let { readTrackCameraCapabilities(it).supportedConstraints }
+            ?: readSupportedCameraConstraints()
+
+    override fun readCapabilities(): BrowserCameraCapabilities = readTrackCameraCapabilities(requireActiveTrack())
+
+    override fun readSettings(): BrowserCameraSettings = readTrackCameraSettings(requireActiveTrack())
+
+    override fun readConstraints(): BrowserCameraAppliedConstraints = readTrackCameraConstraints(requireActiveTrack())
+
+    override suspend fun applyConstraints(constraints: BrowserCameraConstraintSet) {
+        ensureOpen()
+        ensureNoPendingOperation()
+        val track = requireActiveTrack()
+        validateConstraints(constraints, readTrackCameraCapabilities(track))
+        val requestId = beginOperation()
+        try {
+            applyTrackCameraConstraints(track, constraints.toConstraintsJson()).awaitCameraConstraints()
+            if (closed || activeOperationId != requestId || currentTrack !== track) {
+                throw BrowserCameraException(
+                    code = BrowserCameraErrorCode.INVALID_STATE,
+                    message = "The camera track changed before its constraints were applied.",
+                )
+            }
+            emit(BrowserCameraSessionEvent.ConstraintsChanged(readTrackCameraSettings(track)))
         } finally {
             finishOperation(requestId)
         }
@@ -305,6 +346,55 @@ internal class BrowserCameraSessionImpl(initialOptions: BrowserCameraOptions) : 
             throw BrowserCameraException(
                 code = BrowserCameraErrorCode.INVALID_STATE,
                 message = "The camera session has been closed.",
+            )
+        }
+    }
+
+    private fun requireActiveTrack(): MediaStreamTrack = currentTrack ?: throw BrowserCameraException(
+        code = BrowserCameraErrorCode.INVALID_STATE,
+        message = "Camera capabilities and settings are available only while a camera is active.",
+    )
+
+    private fun validateConstraints(
+        constraints: BrowserCameraConstraintSet,
+        capabilities: BrowserCameraCapabilities,
+    ) {
+        val supported = capabilities.supportedConstraints
+        fun requireSupported(requested: Boolean, available: Boolean, name: String) {
+            if (requested && !available) {
+                throw BrowserCameraException(
+                    code = BrowserCameraErrorCode.UNSUPPORTED,
+                    message = "The active camera does not support the '$name' constraint.",
+                    constraint = name,
+                )
+            }
+        }
+
+        requireSupported(constraints.width != null, supported.width, "width")
+        requireSupported(constraints.height != null, supported.height, "height")
+        requireSupported(constraints.aspectRatio != null, supported.aspectRatio, "aspectRatio")
+        requireSupported(constraints.frameRate != null, supported.frameRate, "frameRate")
+        requireSupported(constraints.deviceId != null, supported.deviceId, "deviceId")
+        requireSupported(constraints.facingMode != null, supported.facingMode, "facingMode")
+        requireSupported(constraints.zoom != null, capabilities.zoom != null, "zoom")
+        requireSupported(constraints.torch != null, capabilities.torch == true, "torch")
+
+        val exactZoom = constraints.zoom?.exact
+        val range = capabilities.zoom
+        if (exactZoom != null && range != null &&
+            ((range.min != null && exactZoom < range.min) || (range.max != null && exactZoom > range.max))
+        ) {
+            throw BrowserCameraException(
+                code = BrowserCameraErrorCode.CONSTRAINT_NOT_SATISFIED,
+                message = "Required zoom $exactZoom is outside the camera's supported range.",
+                constraint = "zoom",
+            )
+        }
+
+        if (constraints == BrowserCameraConstraintSet()) {
+            throw BrowserCameraException(
+                code = BrowserCameraErrorCode.INVALID_STATE,
+                message = "At least one camera constraint must be specified.",
             )
         }
     }

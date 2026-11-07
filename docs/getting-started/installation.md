@@ -11,6 +11,8 @@ Add Kamera to your Kotlin Multiplatform project in under 5 minutes.
     - **iOS**: iOS 13.0+
     - **Desktop**: JDK 17+
 
+The `cameraK` Compose library currently supports Android, iOS, and Desktop. A separate `cameraK-web` module contains a standalone Kotlin/JS and Kotlin/WasmJS browser camera demo; it is not currently published as a reusable library dependency. See the [Web Camera Example](../examples/web.md).
+
 ## Step 1: Add Dependencies
 
 ### Using Gradle (Kotlin DSL)

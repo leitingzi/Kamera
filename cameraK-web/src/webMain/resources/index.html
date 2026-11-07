@@ -6,12 +6,18 @@
         <title>CameraK Web</title>
     </head>
     <body>
-        <h1>CameraK Web interop example</h1>
+        <h1>CameraK Web camera example</h1>
         <p id="output">Loading Kotlin and JavaScript...</p>
         <p id="camera-support">Checking camera API support...</p>
         <h2>Available cameras</h2>
         <p>Device labels and available cameras may be limited until camera permission is granted. The list refreshes when devices change.</p>
         <pre id="media-devices">Waiting for device enumeration...</pre>
+        <label for="camera-select">Camera device:</label>
+        <select id="camera-select"><option value="">Browser default camera</option></select>
+        <button id="camera-start" type="button">Open camera</button>
+        <button id="camera-stop" type="button">Stop camera</button>
+        <button id="camera-close" type="button">Close camera</button>
+        <p id="camera-session">Camera state: idle</p>
         <script src="cameraKWebExample.js"></script>
         <script src="cameraK-web.js"></script>
     </body>

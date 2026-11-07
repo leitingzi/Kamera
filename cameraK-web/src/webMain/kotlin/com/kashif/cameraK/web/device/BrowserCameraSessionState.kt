@@ -12,5 +12,7 @@ sealed interface BrowserCameraSessionState {
 
     data object Stopped : BrowserCameraSessionState
 
+    data object Closed : BrowserCameraSessionState
+
     data class Failed(val error: BrowserCameraException) : BrowserCameraSessionState
 }

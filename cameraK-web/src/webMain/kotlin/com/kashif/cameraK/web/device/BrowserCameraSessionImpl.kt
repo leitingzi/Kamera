@@ -107,12 +107,48 @@ internal class BrowserCameraSessionImpl(initialOptions: BrowserCameraOptions) : 
 
         val requestId = beginOperation()
         try {
-            val acquired = acquire(options)
+            val acquired = try {
+                acquire(options)
+            } catch (error: Throwable) {
+                val cameraError = asCameraException(error)
+                if (!cameraError.requiresCameraReleaseForRetry()) throw cameraError
+
+                releaseStream()
+                try {
+                    acquire(options)
+                } catch (switchError: Throwable) {
+                    val switchException = asCameraException(switchError)
+                    if (closed || activeOperationId != requestId) throw switchException
+
+                    try {
+                        val restoredStream = acquire(currentOptions)
+                        ensureOperationCurrent(requestId, restoredStream)
+                        installStream(restoredStream, currentOptions)
+                        setState(BrowserCameraSessionState.Running(currentDevice))
+                        refreshDevices()
+                    } catch (restoreError: Throwable) {
+                        val restoreException = asCameraException(restoreError)
+                        if (!closed && activeOperationId == requestId) {
+                            setState(BrowserCameraSessionState.Failed(restoreException))
+                        }
+                        throw BrowserCameraException(
+                            code = BrowserCameraErrorCode.DEVICE_UNAVAILABLE,
+                            message = "Could not switch cameras, and the previous camera could not be restored: " +
+                                restoreException.message,
+                            browserErrorName = restoreException.browserErrorName,
+                            constraint = restoreException.constraint,
+                            cause = switchException,
+                        )
+                    }
+                    throw switchException
+                }
+            }
             ensureOperationCurrent(requestId, acquired)
             val previousTrack = currentTrack
+            val previousStream = currentStream
             installStream(acquired, options)
             detachTrackListeners(previousTrack)
-            stopTracks(previousStream)
+            previousStream?.let(::stopTracks)
             setState(BrowserCameraSessionState.Running(currentDevice))
             refreshDevices()
         } finally {
@@ -414,6 +450,11 @@ internal class BrowserCameraSessionImpl(initialOptions: BrowserCameraOptions) : 
             message = error.message?.takeIf(String::isNotBlank) ?: "An unexpected camera error occurred.",
             cause = error,
         )
+
+    private fun BrowserCameraException.requiresCameraReleaseForRetry(): Boolean =
+        code == BrowserCameraErrorCode.DEVICE_UNAVAILABLE ||
+            browserErrorName == "NotReadableError" ||
+            browserErrorName == "AbortError"
 
     private fun BrowserCameraFacingMode.toConstraintValue(): String = when (this) {
         BrowserCameraFacingMode.USER -> "user"

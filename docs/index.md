@@ -1,6 +1,6 @@
 # Kamera Documentation
 
-**Modern camera SDK for Kotlin Multiplatform** -- Android, iOS, and Desktop with a unified API.
+**Modern camera SDK for Kotlin Multiplatform** -- a unified Compose camera API for Android, iOS, and Desktop, plus a standalone browser camera demo.
 
 Try the [CameraK Web demo](https://leitingzi.github.io/Kamera/cameraK-web/).
 
@@ -40,7 +40,8 @@ fun CameraScreen() {
 
 ## Features
 
-- **Cross-Platform**: Single API works on Android, iOS, and Desktop
+- **Cross-Platform**: Single Compose API works on Android, iOS, and Desktop
+- **Browser demo**: Standalone Kotlin/JS and WasmJS camera discovery and live preview example
 - **Compose-First**: Built for Jetpack Compose with reactive StateFlow
 - **Plugin System**: Add QR scanning, OCR, and custom processing
 - **Performance**: Direct file capture avoids memory overhead
@@ -54,6 +55,7 @@ Start with installation and configuration:
 - [Quick Start](getting-started/quick-start.md) -- Build your first camera app in 5 minutes
 - [Configuration](getting-started/configuration.md) -- Customize camera behavior
 - [Android Example](examples/android.md) -- Android-specific setup
+- [Web Camera Example](examples/web.md) -- Run the standalone browser preview demo
 
 ## Core Concepts
 
@@ -116,6 +118,7 @@ val cameraState by rememberCameraKState(
 - [Zoom Control](guides/zoom-control.md)
 - [Camera Switching](guides/camera-switching.md)
 - [Plugins](guides/plugins.md)
+- [Web Camera](guides/web-camera.md) -- Browser prerequisites and support boundary
 
 **API Reference**
 - [CameraKStateHolder](api/state-holder.md)
@@ -131,6 +134,8 @@ val cameraState by rememberCameraKState(
 | Android  | API 21 (5.0)    | CameraX |
 | iOS      | 13.0            | AVFoundation |
 | Desktop  | JDK 17+         | JavaCV |
+
+The separate `cameraK-web` module provides a JS/WasmJS browser demo; it is not currently a browser target of the `cameraK` Compose library.
 
 ## Support
 

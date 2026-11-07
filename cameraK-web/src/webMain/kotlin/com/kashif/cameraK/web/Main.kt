@@ -11,6 +11,7 @@ import com.kashif.cameraK.web.interop.runPlatformInteropDemo
 import com.kashif.cameraK.web.preview.BrowserCameraPreview
 import kotlinx.browser.document
 import kotlinx.browser.window
+import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLOptionElement
 import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.HTMLVideoElement
@@ -27,22 +28,81 @@ fun main() {
     val cameraMessage = support.unsupportedReason ?: "Camera API is supported by this browser."
     val cameraSelect = document.getElementById("camera-select") as? HTMLSelectElement
     val cameraVideo = document.getElementById("camera-preview") as? HTMLVideoElement
+    val previewPlaceholder = document.getElementById("preview-placeholder")
+    val startButton = document.getElementById("camera-start") as? HTMLButtonElement
+    val stopButton = document.getElementById("camera-stop") as? HTMLButtonElement
+    val closeButton = document.getElementById("camera-close") as? HTMLButtonElement
     val cameraSessionMessage = document.getElementById("camera-session")
+    val cameraStatus = document.getElementById("camera-status")
+    val cameraSelectHint = document.getElementById("camera-select-hint")
     var session: BrowserCameraSession? = null
     var deviceChanges: BrowserCameraSubscription? = null
+    var selectedCameraId = cameraSelect?.value.orEmpty()
     val preview = BrowserCameraPreview.create()
+
+    fun showStatus(message: String, hasError: Boolean = false) {
+        cameraSessionMessage?.textContent = message
+        cameraStatus?.setAttribute("data-state", if (hasError) "error" else "idle")
+    }
+
+    fun updateControls() {
+        val cameraState = session?.state
+        val isRunning = cameraState is BrowserCameraSessionState.Running
+        val isStarting = cameraState is BrowserCameraSessionState.Starting
+        cameraSelect?.disabled = session != null
+        startButton?.disabled = isRunning || isStarting
+        stopButton?.disabled = !isRunning
+        closeButton?.disabled = session == null || isStarting
+        cameraStatus?.setAttribute(
+            "data-state",
+            when (cameraState) {
+                is BrowserCameraSessionState.Running -> "running"
+                is BrowserCameraSessionState.Failed -> "error"
+                else -> "idle"
+            },
+        )
+        cameraSelectHint?.textContent =
+            if (session == null) {
+                "Camera names may be hidden until you grant permission."
+            } else {
+                "Close the camera before choosing another device."
+            }
+        if (isRunning && preview.isAttached && preview.playbackError == null) {
+            previewPlaceholder?.setAttribute("hidden", "")
+        } else {
+            previewPlaceholder?.removeAttribute("hidden")
+        }
+    }
+
+    fun showSessionState(state: BrowserCameraSessionState) {
+        when (state) {
+            BrowserCameraSessionState.Idle -> showStatus("Choose a camera and open it to begin.")
+            BrowserCameraSessionState.Starting -> showStatus("Requesting camera access…")
+            is BrowserCameraSessionState.Running ->
+                showStatus("Camera is on. Close it before choosing another camera.")
+            BrowserCameraSessionState.Stopped ->
+                showStatus("Camera stopped. Close it to choose another device.")
+            BrowserCameraSessionState.Closed -> showStatus("Camera closed. Choose a camera to continue.")
+            is BrowserCameraSessionState.Failed -> showStatus("Camera error: ${state.error.message}", hasError = true)
+        }
+        updateControls()
+    }
+
     preview.observePlaybackErrors { error ->
-        cameraSessionMessage?.textContent = "Preview playback failed: ${error.message}"
+        showStatus("Preview playback failed: ${error.message}", hasError = true)
+        updateControls()
     }
 
     document.getElementById("output")?.textContent = result.interopMessage
     document.getElementById("camera-support")?.textContent = cameraMessage
+    updateControls()
 
     if (support.canEnumerateDevices) {
         val refreshCameras = {
             browserMediaDevices.getCameraDevices(
                 onSuccess = { devices ->
                     renderCameraDevices(devices, cameraSelect)
+                    if (session == null) selectedCameraId = cameraSelect?.value.orEmpty()
                 },
                 onFailure = { error ->
                     val message = buildString {
@@ -75,18 +135,24 @@ fun main() {
     )
 
     document.getElementById("camera-start")?.addEventListener("click") {
+        if (session?.state is BrowserCameraSessionState.Running ||
+            session?.state is BrowserCameraSessionState.Starting
+        ) {
+            return@addEventListener
+        }
         val activeSession = session ?: BrowserCameraSession.create(
-            BrowserCameraOptions(deviceId = cameraSelect?.value?.takeIf(String::isNotBlank)),
+            BrowserCameraOptions(deviceId = selectedCameraId.takeIf(String::isNotBlank)),
         ).also { created ->
             session = created
             created.observeState { state ->
-                cameraSessionMessage?.textContent = "Camera state: $state"
+                showSessionState(state)
             }
             created.observeEvents { event ->
                 if (event is BrowserCameraSessionEvent.DevicesChanged) {
                     renderCameraDevices(event.devices, cameraSelect)
                 }
             }
+            updateControls()
         }
         launchCameraOperation(
             block = {
@@ -94,24 +160,23 @@ fun main() {
                 cameraVideo?.let { preview.attach(activeSession, it) }
             },
             onResult = { error ->
-                cameraSessionMessage?.textContent =
-                    error?.let { "Camera or preview failed: ${it.message}" } ?: "Camera started and preview is playing."
+                if (error != null) {
+                    showStatus("Camera or preview failed: ${error.message}", hasError = true)
+                } else {
+                    updateControls()
+                }
             },
         )
     }
 
     document.getElementById("camera-select")?.addEventListener("change") {
-        val activeSession = session ?: return@addEventListener
-        if (activeSession.state is BrowserCameraSessionState.Running) {
-            val options = BrowserCameraOptions(deviceId = cameraSelect?.value?.takeIf(String::isNotBlank))
-            launchCameraOperation(
-                block = { activeSession.switchCamera(options) },
-                onResult = { error ->
-                    cameraSessionMessage?.textContent =
-                        error?.let { "Camera switch failed: ${it.message}" } ?: "Camera switched."
-                },
-            )
+        if (session != null) {
+            cameraSelect?.value = selectedCameraId
+            showStatus("Close the camera before choosing another device.")
+            return@addEventListener
         }
+        selectedCameraId = cameraSelect?.value.orEmpty()
+        showStatus("Camera selected. Open it when you're ready.")
     }
 
     document.getElementById("camera-stop")?.addEventListener("click") {
@@ -119,8 +184,7 @@ fun main() {
         launchCameraOperation(
             block = { activeSession.stop() },
             onResult = { error ->
-                cameraSessionMessage?.textContent =
-                    error?.let { "Camera stop failed: ${it.message}" } ?: "Camera stopped."
+                if (error != null) showStatus("Camera stop failed: ${error.message}", hasError = true)
             },
         )
     }
@@ -130,9 +194,13 @@ fun main() {
         launchCameraOperation(
             block = { activeSession.close() },
             onResult = { error ->
-                session = null
-                cameraSessionMessage?.textContent =
-                    error?.let { "Camera close failed: ${it.message}" } ?: "Camera closed and tracks released."
+                if (error != null) {
+                    showStatus("Camera close failed: ${error.message}", hasError = true)
+                } else {
+                    session = null
+                    showStatus("Camera closed. Choose a camera to continue.")
+                    updateControls()
+                }
             },
         )
     }

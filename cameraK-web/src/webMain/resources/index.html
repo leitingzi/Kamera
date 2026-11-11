@@ -117,6 +117,12 @@
             .device-info { padding: 17px 21px 19px; }
             .device-info h3 { margin: 0 0 9px; color: #cbd4e8; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
             .device-info pre { max-height: 92px; overflow: auto; margin: 0; color: var(--muted); font: inherit; font-size: 12px; line-height: 1.6; white-space: pre-wrap; }
+            .photo-result { display: grid; gap: 10px; padding: 17px 21px 19px; border-top: 1px solid var(--line); }
+            .photo-result h3 { margin: 0; color: #cbd4e8; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+            .photo-result-image { width: 100%; max-height: 320px; border-radius: 12px; background: #090d18; object-fit: contain; }
+            .photo-result-copy { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+            .photo-download { justify-self: start; color: var(--accent-bright); font-size: 12px; font-weight: 650; text-decoration: none; }
+            .photo-download:hover { text-decoration: underline; }
 
             .controls-card { padding: 21px; }
             .section-kicker { margin: 0 0 7px; color: var(--accent-bright); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
@@ -149,6 +155,10 @@
             .button-secondary:not(:disabled):hover { border-color: rgba(174, 188, 219, 0.35); background: rgba(51, 62, 89, 0.75); }
             .button-close { border-color: rgba(239, 135, 147, 0.18); background: rgba(98, 43, 58, 0.2); color: #e8a4ad; }
             .button-close:not(:disabled):hover { background: rgba(125, 53, 70, 0.32); }
+            .photo-controls { display: grid; gap: 9px; margin-top: 15px; }
+            .photo-controls .field-label { margin: 0; }
+            .button-photo { width: 100%; background: rgba(155, 140, 255, 0.14); border-color: rgba(183, 173, 255, 0.22); color: var(--accent-bright); }
+            .button-photo:not(:disabled):hover { background: rgba(155, 140, 255, 0.22); }
 
             .session-status { display: flex; gap: 10px; align-items: flex-start; margin-top: 19px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(9, 14, 26, 0.42); }
             .status-indicator { width: 8px; height: 8px; flex: 0 0 auto; margin-top: 4px; border-radius: 50%; background: #75819b; }
@@ -198,8 +208,8 @@
 
             <section class="intro" aria-labelledby="page-title">
                 <p class="eyebrow">Live camera</p>
-                <h1 id="page-title">Camera preview</h1>
-                <p class="intro-copy">Choose a video input and start a live preview. Camera access is requested only after you press Open camera.</p>
+                <h1 id="page-title">Camera preview &amp; photo capture</h1>
+                <p class="intro-copy">Choose a video input, start a live preview, and capture a JPEG or PNG still image. Camera access is requested only after you press Open camera.</p>
             </section>
 
             <section class="workspace" aria-label="Camera workspace">
@@ -228,6 +238,12 @@
                         <h3>Available cameras</h3>
                         <pre id="media-devices" aria-live="polite">Waiting for device list…</pre>
                     </div>
+                    <section class="photo-result" aria-labelledby="photo-result-title">
+                        <h3 id="photo-result-title">Captured photo</h3>
+                        <img id="photo-result-image" class="photo-result-image" alt="Captured camera photo" hidden>
+                        <p id="photo-result-info" class="photo-result-copy">No photo captured yet.</p>
+                        <a id="photo-download" class="photo-download" hidden>Download photo</a>
+                    </section>
                 </article>
 
                 <aside class="card controls-card" aria-labelledby="controls-title">
@@ -245,6 +261,19 @@
                         <button id="camera-start" class="button-primary" type="button">Open camera</button>
                         <button id="camera-stop" class="button-secondary" type="button" disabled>Stop</button>
                         <button id="camera-close" class="button-close" type="button" disabled>Close camera</button>
+                    </div>
+
+                    <div class="photo-controls">
+                        <label class="field-label" for="photo-format">Photo format</label>
+                        <select id="photo-format" aria-label="Photo format">
+                            <option value="jpeg">JPEG</option>
+                            <option value="png">PNG</option>
+                        </select>
+                        <button id="photo-capture" class="button-photo" type="button" disabled>Take photo</button>
+                    </div>
+                    <div id="photo-status" class="session-status" data-state="idle" role="status" aria-live="polite">
+                        <span class="status-indicator" aria-hidden="true"></span>
+                        <p>Start the camera to take a photo.</p>
                     </div>
 
                     <div id="camera-status" class="session-status" data-state="idle" role="status" aria-live="polite">

@@ -12,14 +12,25 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+internal interface BrowserCameraPreviewCaptureSource {
+    val captureSession: BrowserCameraSession?
+    val captureVideoElement: HTMLVideoElement?
+}
+
 @OptIn(ExperimentalWasmJsInterop::class)
-internal class BrowserCameraPreviewImpl : BrowserCameraPreview {
+internal class BrowserCameraPreviewImpl : BrowserCameraPreview, BrowserCameraPreviewCaptureSource {
     private val errorListeners = mutableSetOf<(BrowserCameraException) -> Unit>()
     private var videoElement: HTMLVideoElement? = null
     private var session: BrowserCameraSession? = null
     private var boundStream: MediaStream? = null
     private var sessionSubscription: BrowserCameraSubscription? = null
     private var closed = false
+
+    override val captureSession: BrowserCameraSession?
+        get() = session
+
+    override val captureVideoElement: HTMLVideoElement?
+        get() = videoElement
 
     override var playbackError: BrowserCameraException? = null
         private set

@@ -7,14 +7,22 @@ import com.kashif.cameraK.web.device.BrowserCameraSessionState
 import com.kashif.cameraK.web.device.BrowserCameraSubscription
 import com.kashif.cameraK.web.device.BrowserMediaDevices
 import com.kashif.cameraK.web.device.CameraDeviceInfo
+import com.kashif.cameraK.web.error.BrowserCameraException
 import com.kashif.cameraK.web.interop.runPlatformInteropDemo
+import com.kashif.cameraK.web.photo.BrowserPhotoCapture
+import com.kashif.cameraK.web.photo.BrowserPhotoFormat
+import com.kashif.cameraK.web.photo.BrowserPhotoOptions
+import com.kashif.cameraK.web.photo.BrowserPhotoResult
 import com.kashif.cameraK.web.preview.BrowserCameraPreview
 import kotlinx.browser.document
 import kotlinx.browser.window
+import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLButtonElement
+import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLOptionElement
 import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.HTMLVideoElement
+import org.w3c.dom.url.URL
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -32,17 +40,64 @@ fun main() {
     val startButton = document.getElementById("camera-start") as? HTMLButtonElement
     val stopButton = document.getElementById("camera-stop") as? HTMLButtonElement
     val closeButton = document.getElementById("camera-close") as? HTMLButtonElement
+    val photoCaptureButton = document.getElementById("photo-capture") as? HTMLButtonElement
+    val photoFormatSelect = document.getElementById("photo-format") as? HTMLSelectElement
+    val photoStatus = document.getElementById("photo-status")
+    val photoStatusMessage = photoStatus?.querySelector("p")
+    val photoResultImage = document.getElementById("photo-result-image") as? HTMLImageElement
+    val photoResultInfo = document.getElementById("photo-result-info")
+    val photoDownload = document.getElementById("photo-download") as? HTMLAnchorElement
     val cameraSessionMessage = document.getElementById("camera-session")
     val cameraStatus = document.getElementById("camera-status")
     val cameraSelectHint = document.getElementById("camera-select-hint")
     var session: BrowserCameraSession? = null
     var deviceChanges: BrowserCameraSubscription? = null
     var selectedCameraId = cameraSelect?.value.orEmpty()
+    var cameraListHint = "Camera names may be hidden until permission is granted."
+    var photoCaptureInProgress = false
+    var photoObjectUrl: String? = null
     val preview = BrowserCameraPreview.create()
+    val photoCapture = BrowserPhotoCapture.create()
 
     fun showStatus(message: String, hasError: Boolean = false) {
         cameraSessionMessage?.textContent = message
         cameraStatus?.setAttribute("data-state", if (hasError) "error" else "idle")
+    }
+
+    fun showPhotoStatus(message: String, hasError: Boolean = false) {
+        photoStatusMessage?.textContent = message
+        photoStatus?.setAttribute("data-state", if (hasError) "error" else "idle")
+    }
+
+    fun releasePhotoObjectUrl() {
+        photoObjectUrl?.let { URL.revokeObjectURL(it) }
+        photoObjectUrl = null
+        photoResultImage?.removeAttribute("src")
+        photoResultImage?.hidden = true
+        photoResultInfo?.textContent = "No photo captured yet."
+        photoDownload?.removeAttribute("href")
+        photoDownload?.removeAttribute("download")
+        photoDownload?.hidden = true
+    }
+
+    fun showCapturedPhoto(result: BrowserPhotoResult) {
+        val nextUrl = URL.createObjectURL(result.blob)
+        try {
+            photoResultImage?.src = nextUrl
+            photoResultImage?.hidden = false
+            photoResultInfo?.textContent =
+                "${result.width} × ${result.height} · ${result.mimeType} · " +
+                    if (result.usedPreviewFrameFallback) "Preview-frame fallback" else "ImageCapture"
+            photoDownload?.href = nextUrl
+            photoDownload?.download =
+                "camerak-photo.${if (result.mimeType == BrowserPhotoFormat.PNG.mimeType) "png" else "jpg"}"
+            photoDownload?.hidden = false
+        } catch (error: Throwable) {
+            URL.revokeObjectURL(nextUrl)
+            throw error
+        }
+        photoObjectUrl?.let { URL.revokeObjectURL(it) }
+        photoObjectUrl = nextUrl
     }
 
     fun updateControls() {
@@ -53,6 +108,8 @@ fun main() {
         startButton?.disabled = isRunning || isStarting
         stopButton?.disabled = !isRunning
         closeButton?.disabled = session == null || isStarting
+        photoCaptureButton?.disabled = !isRunning || !preview.isAttached || photoCaptureInProgress
+        photoFormatSelect?.disabled = photoCaptureInProgress
         cameraStatus?.setAttribute(
             "data-state",
             when (cameraState) {
@@ -63,7 +120,7 @@ fun main() {
         )
         cameraSelectHint?.textContent =
             if (session == null) {
-                "Camera names may be hidden until you grant permission."
+                cameraListHint
             } else {
                 "Close the camera before choosing another device."
             }
@@ -102,7 +159,9 @@ fun main() {
             browserMediaDevices.getCameraDevices(
                 onSuccess = { devices ->
                     renderCameraDevices(devices, cameraSelect)
+                    cameraListHint = describeCameraList(devices)
                     if (session == null) selectedCameraId = cameraSelect?.value.orEmpty()
+                    updateControls()
                 },
                 onFailure = { error ->
                     val message = buildString {
@@ -129,7 +188,10 @@ fun main() {
         {
             deviceChanges?.cancel()
             preview.close()
-            session?.let { activeSession -> launchCameraOperation({ activeSession.close() }, {}) }
+            releasePhotoObjectUrl()
+            session?.let { activeSession ->
+                launchCameraOperation({ activeSession.close() }) { _, _ -> }
+            }
         },
         options = true,
     )
@@ -150,6 +212,8 @@ fun main() {
             created.observeEvents { event ->
                 if (event is BrowserCameraSessionEvent.DevicesChanged) {
                     renderCameraDevices(event.devices, cameraSelect)
+                    cameraListHint = describeCameraList(event.devices)
+                    updateControls()
                 }
             }
             updateControls()
@@ -159,12 +223,71 @@ fun main() {
                 activeSession.start()
                 cameraVideo?.let { preview.attach(activeSession, it) }
             },
-            onResult = { error ->
+            onResult = { _, error ->
                 if (error != null) {
                     showStatus("Camera or preview failed: ${error.message}", hasError = true)
                 } else {
                     updateControls()
                 }
+            },
+        )
+    }
+
+    document.getElementById("photo-capture")?.addEventListener("click") {
+        val activeSession = session ?: return@addEventListener
+        if (photoCaptureInProgress || activeSession.state !is BrowserCameraSessionState.Running ||
+            !preview.isAttached
+        ) {
+            return@addEventListener
+        }
+
+        val format =
+            if (photoFormatSelect?.value == "png") BrowserPhotoFormat.PNG else BrowserPhotoFormat.JPEG
+        photoCaptureInProgress = true
+        showPhotoStatus("Capturing photo…")
+        updateControls()
+        launchCameraOperation(
+            block = {
+                photoCapture.capture(
+                    session = activeSession,
+                    preview = preview,
+                    options = BrowserPhotoOptions(format = format),
+                )
+            },
+            onResult = { result, error ->
+                photoCaptureInProgress = false
+                when {
+                    error != null -> {
+                        val detail = if (error is BrowserCameraException) {
+                            buildString {
+                                append("[${error.code}] ")
+                                error.browserErrorName?.let { append("$it: ") }
+                                append(error.message)
+                            }
+                        } else {
+                            error.message ?: "An unexpected error occurred."
+                        }
+                        showPhotoStatus("Photo capture failed: $detail", hasError = true)
+                    }
+
+                    result == null -> {
+                        showPhotoStatus("Photo capture returned no result.", hasError = true)
+                    }
+
+                    else -> try {
+                        showCapturedPhoto(result)
+                        showPhotoStatus(
+                            "Photo captured: ${result.width} × ${result.height} ${result.mimeType}.",
+                        )
+                    } catch (displayError: Throwable) {
+                        showPhotoStatus(
+                            "Photo captured but could not be displayed: " +
+                                (displayError.message ?: "unknown display error"),
+                            hasError = true,
+                        )
+                    }
+                }
+                updateControls()
             },
         )
     }
@@ -183,7 +306,7 @@ fun main() {
         val activeSession = session ?: return@addEventListener
         launchCameraOperation(
             block = { activeSession.stop() },
-            onResult = { error ->
+            onResult = { _, error ->
                 if (error != null) showStatus("Camera stop failed: ${error.message}", hasError = true)
             },
         )
@@ -193,7 +316,7 @@ fun main() {
         val activeSession = session ?: return@addEventListener
         launchCameraOperation(
             block = { activeSession.close() },
-            onResult = { error ->
+            onResult = { _, error ->
                 if (error != null) {
                     showStatus("Camera close failed: ${error.message}", hasError = true)
                 } else {
@@ -210,43 +333,71 @@ fun main() {
 }
 
 private fun renderCameraDevices(devices: List<CameraDeviceInfo>, cameraSelect: HTMLSelectElement?) {
+    val selectableDevices = devices.filter { it.deviceId.isNotBlank() }
     val selectedId = cameraSelect?.value.orEmpty()
     cameraSelect?.innerHTML = ""
     val defaultOption = document.createElement("option") as HTMLOptionElement
     defaultOption.value = ""
     defaultOption.textContent = "Browser default camera"
     cameraSelect?.appendChild(defaultOption)
-    devices.forEach { device ->
+    if (devices.isNotEmpty() && selectableDevices.isEmpty()) {
+        val hiddenOption = document.createElement("option") as HTMLOptionElement
+        hiddenOption.value = "__camera_details_hidden__"
+        hiddenOption.textContent = "Camera choices appear after permission"
+        hiddenOption.disabled = true
+        cameraSelect?.appendChild(hiddenOption)
+    }
+    selectableDevices.forEachIndexed { index, device ->
         val option = document.createElement("option") as HTMLOptionElement
         option.value = device.deviceId
-        option.textContent = device.label.ifBlank { "Camera (${device.deviceId.take(8)})" }
+        option.textContent = device.label.ifBlank { "Camera ${index + 1}" }
         cameraSelect?.appendChild(option)
     }
-    cameraSelect?.value = selectedId
+    cameraSelect?.value =
+        selectedId.takeIf { id -> selectableDevices.any { it.deviceId == id } }.orEmpty()
 
     val message =
         if (devices.isEmpty()) {
-            "No video input devices are currently visible to this page."
+            "No video input devices are visible yet. Open the camera to request access; this list refreshes after permission is granted."
+        } else if (selectableDevices.isEmpty()) {
+            val cameraCount = if (devices.size == 1) "1 camera was detected" else "${devices.size} cameras were detected"
+            "$cameraCount, but the browser hides device names and IDs until permission is granted. Open the browser default camera to continue."
         } else {
-            devices.mapIndexed { index, device ->
-                val label = device.label.ifBlank { "Camera label hidden until permission is granted" }
-                "${index + 1}. $label"
-            }.joinToString("\n")
+            buildString {
+                append(
+                    selectableDevices.mapIndexed { index, device ->
+                        val label = device.label.ifBlank { "Camera ${index + 1}" }
+                        "${index + 1}. $label"
+                    }.joinToString("\n"),
+                )
+                if (selectableDevices.size < devices.size) {
+                    append("\nSome camera details remain hidden until permission is granted.")
+                }
+            }
         }
     document.getElementById("media-devices")?.textContent = message
     println("Available cameras:\n$message")
 }
 
-private fun launchCameraOperation(
-    block: suspend () -> Unit,
-    onResult: (Throwable?) -> Unit,
-) {
+private fun describeCameraList(devices: List<CameraDeviceInfo>): String = when {
+    devices.isEmpty() ->
+        "No cameras are visible yet. Press Open camera to request access; this list refreshes after permission is granted."
+
+    devices.none { it.deviceId.isNotBlank() } -> {
+        val cameraCount = if (devices.size == 1) "A camera was detected" else "${devices.size} cameras were detected"
+        "$cameraCount, but the browser hides device names and IDs until permission is granted. Keep Browser default camera selected and press Open camera."
+    }
+
+    else -> "Camera list is ready. Close the current camera before selecting another device."
+}
+
+private fun <T> launchCameraOperation(block: suspend () -> T, onResult: (T?, Throwable?) -> Unit) {
     block.startCoroutine(
-        object : Continuation<Unit> {
+        object : Continuation<T> {
             override val context = EmptyCoroutineContext
 
-            override fun resumeWith(result: Result<Unit>) {
-                onResult(result.exceptionOrNull())
+            override fun resumeWith(result: Result<T>) {
+                onResult(result.getOrNull(), result.exceptionOrNull())
             }
         },
     )

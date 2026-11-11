@@ -9,4 +9,7 @@ data class BrowserPhotoResult(
     val width: Int,
     val height: Int,
     val source: BrowserPhotoSource,
-)
+) {
+    /** Whether the image was encoded from the currently displayed preview frame. */
+    val usedPreviewFrameFallback: Boolean get() = source == BrowserPhotoSource.PREVIEW_FRAME
+}

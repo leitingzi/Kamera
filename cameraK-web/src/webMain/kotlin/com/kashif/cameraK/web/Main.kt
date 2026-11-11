@@ -53,6 +53,7 @@ fun main() {
     var session: BrowserCameraSession? = null
     var deviceChanges: BrowserCameraSubscription? = null
     var selectedCameraId = cameraSelect?.value.orEmpty()
+    var cameraListHint = "Camera names may be hidden until permission is granted."
     var photoCaptureInProgress = false
     var photoObjectUrl: String? = null
     val preview = BrowserCameraPreview.create()
@@ -119,7 +120,7 @@ fun main() {
         )
         cameraSelectHint?.textContent =
             if (session == null) {
-                "Camera names may be hidden until you grant permission."
+                cameraListHint
             } else {
                 "Close the camera before choosing another device."
             }
@@ -158,7 +159,9 @@ fun main() {
             browserMediaDevices.getCameraDevices(
                 onSuccess = { devices ->
                     renderCameraDevices(devices, cameraSelect)
+                    cameraListHint = describeCameraList(devices)
                     if (session == null) selectedCameraId = cameraSelect?.value.orEmpty()
+                    updateControls()
                 },
                 onFailure = { error ->
                     val message = buildString {
@@ -209,6 +212,8 @@ fun main() {
             created.observeEvents { event ->
                 if (event is BrowserCameraSessionEvent.DevicesChanged) {
                     renderCameraDevices(event.devices, cameraSelect)
+                    cameraListHint = describeCameraList(event.devices)
+                    updateControls()
                 }
             }
             updateControls()
@@ -328,31 +333,62 @@ fun main() {
 }
 
 private fun renderCameraDevices(devices: List<CameraDeviceInfo>, cameraSelect: HTMLSelectElement?) {
+    val selectableDevices = devices.filter { it.deviceId.isNotBlank() }
     val selectedId = cameraSelect?.value.orEmpty()
     cameraSelect?.innerHTML = ""
     val defaultOption = document.createElement("option") as HTMLOptionElement
     defaultOption.value = ""
     defaultOption.textContent = "Browser default camera"
     cameraSelect?.appendChild(defaultOption)
-    devices.forEach { device ->
+    if (devices.isNotEmpty() && selectableDevices.isEmpty()) {
+        val hiddenOption = document.createElement("option") as HTMLOptionElement
+        hiddenOption.value = "__camera_details_hidden__"
+        hiddenOption.textContent = "Camera choices appear after permission"
+        hiddenOption.disabled = true
+        cameraSelect?.appendChild(hiddenOption)
+    }
+    selectableDevices.forEachIndexed { index, device ->
         val option = document.createElement("option") as HTMLOptionElement
         option.value = device.deviceId
-        option.textContent = device.label.ifBlank { "Camera (${device.deviceId.take(8)})" }
+        option.textContent = device.label.ifBlank { "Camera ${index + 1}" }
         cameraSelect?.appendChild(option)
     }
-    cameraSelect?.value = selectedId
+    cameraSelect?.value =
+        selectedId.takeIf { id -> selectableDevices.any { it.deviceId == id } }.orEmpty()
 
     val message =
         if (devices.isEmpty()) {
-            "No video input devices are currently visible to this page."
+            "No video input devices are visible yet. Open the camera to request access; this list refreshes after permission is granted."
+        } else if (selectableDevices.isEmpty()) {
+            val cameraCount = if (devices.size == 1) "1 camera was detected" else "${devices.size} cameras were detected"
+            "$cameraCount, but the browser hides device names and IDs until permission is granted. Open the browser default camera to continue."
         } else {
-            devices.mapIndexed { index, device ->
-                val label = device.label.ifBlank { "Camera label hidden until permission is granted" }
-                "${index + 1}. $label"
-            }.joinToString("\n")
+            buildString {
+                append(
+                    selectableDevices.mapIndexed { index, device ->
+                        val label = device.label.ifBlank { "Camera ${index + 1}" }
+                        "${index + 1}. $label"
+                    }.joinToString("\n"),
+                )
+                if (selectableDevices.size < devices.size) {
+                    append("\nSome camera details remain hidden until permission is granted.")
+                }
+            }
         }
     document.getElementById("media-devices")?.textContent = message
     println("Available cameras:\n$message")
+}
+
+private fun describeCameraList(devices: List<CameraDeviceInfo>): String = when {
+    devices.isEmpty() ->
+        "No cameras are visible yet. Press Open camera to request access; this list refreshes after permission is granted."
+
+    devices.none { it.deviceId.isNotBlank() } -> {
+        val cameraCount = if (devices.size == 1) "A camera was detected" else "${devices.size} cameras were detected"
+        "$cameraCount, but the browser hides device names and IDs until permission is granted. Keep Browser default camera selected and press Open camera."
+    }
+
+    else -> "Camera list is ready. Close the current camera before selecting another device."
 }
 
 private fun <T> launchCameraOperation(block: suspend () -> T, onResult: (T?, Throwable?) -> Unit) {

@@ -1,0 +1,114 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <dev.kashifmehmood:ocrPlugin>
+final class dev.kashifmehmood.camerak.ocr/OcrConfig { // dev.kashifmehmood.camerak.ocr/OcrConfig|null[0]
+    final val level // dev.kashifmehmood.camerak.ocr/OcrConfig.level|{}level[0]
+        final fun <get-level>(): dev.kashifmehmood.camerak.ocr/OcrLevel // dev.kashifmehmood.camerak.ocr/OcrConfig.level.<get-level>|<get-level>(){}[0]
+    final val maxFps // dev.kashifmehmood.camerak.ocr/OcrConfig.maxFps|{}maxFps[0]
+        final fun <get-maxFps>(): kotlin/Float // dev.kashifmehmood.camerak.ocr/OcrConfig.maxFps.<get-maxFps>|<get-maxFps>(){}[0]
+    final val region // dev.kashifmehmood.camerak.ocr/OcrConfig.region|{}region[0]
+        final fun <get-region>(): dev.kashifmehmood.camerak.frames/FrameRect? // dev.kashifmehmood.camerak.ocr/OcrConfig.region.<get-region>|<get-region>(){}[0]
+    final val tessdataPath // dev.kashifmehmood.camerak.ocr/OcrConfig.tessdataPath|{}tessdataPath[0]
+        final fun <get-tessdataPath>(): kotlin/String? // dev.kashifmehmood.camerak.ocr/OcrConfig.tessdataPath.<get-tessdataPath>|<get-tessdataPath>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // dev.kashifmehmood.camerak.ocr/OcrConfig.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // dev.kashifmehmood.camerak.ocr/OcrConfig.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // dev.kashifmehmood.camerak.ocr/OcrConfig.toString|toString(){}[0]
+
+    final class Builder { // dev.kashifmehmood.camerak.ocr/OcrConfig.Builder|null[0]
+        final var level // dev.kashifmehmood.camerak.ocr/OcrConfig.Builder.level|{}level[0]
+            final fun <get-level>(): dev.kashifmehmood.camerak.ocr/OcrLevel // dev.kashifmehmood.camerak.ocr/OcrConfig.Builder.level.<get-level>|<get-level>(){}[0]
+            final fun <set-level>(dev.kashifmehmood.camerak.ocr/OcrLevel) // dev.kashifmehmood.camerak.ocr/OcrConfig.Builder.level.<set-level>|<set-level>(dev.kashifmehmood.camerak.ocr.OcrLevel){}[0]
+        final var maxFps // dev.kashifmehmood.camerak.ocr/OcrConfig.Builder.maxFps|{}maxFps[0]
+            final fun <get-maxFps>(): kotlin/Float // dev.kashifmehmood.camerak.ocr/OcrConfig.Builder.maxFps.<get-maxFps>|<get-maxFps>(){}[0]
+            final fun <set-maxFps>(kotlin/Float) // dev.kashifmehmood.camerak.ocr/OcrConfig.Builder.maxFps.<set-maxFps>|<set-maxFps>(kotlin.Float){}[0]
+        final var region // dev.kashifmehmood.camerak.ocr/OcrConfig.Builder.region|{}region[0]
+            final fun <get-region>(): dev.kashifmehmood.camerak.frames/FrameRect? // dev.kashifmehmood.camerak.ocr/OcrConfig.Builder.region.<get-region>|<get-region>(){}[0]
+            final fun <set-region>(dev.kashifmehmood.camerak.frames/FrameRect?) // dev.kashifmehmood.camerak.ocr/OcrConfig.Builder.region.<set-region>|<set-region>(dev.kashifmehmood.camerak.frames.FrameRect?){}[0]
+        final var tessdataPath // dev.kashifmehmood.camerak.ocr/OcrConfig.Builder.tessdataPath|{}tessdataPath[0]
+            final fun <get-tessdataPath>(): kotlin/String? // dev.kashifmehmood.camerak.ocr/OcrConfig.Builder.tessdataPath.<get-tessdataPath>|<get-tessdataPath>(){}[0]
+            final fun <set-tessdataPath>(kotlin/String?) // dev.kashifmehmood.camerak.ocr/OcrConfig.Builder.tessdataPath.<set-tessdataPath>|<set-tessdataPath>(kotlin.String?){}[0]
+    }
+}
+
+final class dev.kashifmehmood.camerak.ocr/OcrPlugin : dev.kashifmehmood.camerak.state/CameraKPlugin { // dev.kashifmehmood.camerak.ocr/OcrPlugin|null[0]
+    constructor <init>(dev.kashifmehmood.camerak.ocr/OcrConfig = ...) // dev.kashifmehmood.camerak.ocr/OcrPlugin.<init>|<init>(dev.kashifmehmood.camerak.ocr.OcrConfig){}[0]
+
+    final val config // dev.kashifmehmood.camerak.ocr/OcrPlugin.config|{}config[0]
+        final fun <get-config>(): dev.kashifmehmood.camerak.ocr/OcrConfig // dev.kashifmehmood.camerak.ocr/OcrPlugin.config.<get-config>|<get-config>(){}[0]
+    final val results // dev.kashifmehmood.camerak.ocr/OcrPlugin.results|{}results[0]
+        final fun <get-results>(): kotlinx.coroutines.flow/Flow<dev.kashifmehmood.camerak.ocr/RecognizedText> // dev.kashifmehmood.camerak.ocr/OcrPlugin.results.<get-results>|<get-results>(){}[0]
+    final val status // dev.kashifmehmood.camerak.ocr/OcrPlugin.status|{}status[0]
+        final fun <get-status>(): kotlinx.coroutines.flow/StateFlow<dev.kashifmehmood.camerak.plugin/PluginStatus> // dev.kashifmehmood.camerak.ocr/OcrPlugin.status.<get-status>|<get-status>(){}[0]
+
+    final fun onAttach(dev.kashifmehmood.camerak.plugin/CameraKPluginContext) // dev.kashifmehmood.camerak.ocr/OcrPlugin.onAttach|onAttach(dev.kashifmehmood.camerak.plugin.CameraKPluginContext){}[0]
+    final fun onDetach() // dev.kashifmehmood.camerak.ocr/OcrPlugin.onDetach|onDetach(){}[0]
+    final fun pause() // dev.kashifmehmood.camerak.ocr/OcrPlugin.pause|pause(){}[0]
+    final fun resume() // dev.kashifmehmood.camerak.ocr/OcrPlugin.resume|resume(){}[0]
+    final suspend fun recognize(dev.kashifmehmood.camerak.capture/CapturedImage, dev.kashifmehmood.camerak.ocr/OcrLevel = ...): dev.kashifmehmood.camerak.result/CameraKResult<dev.kashifmehmood.camerak.ocr/RecognizedText> // dev.kashifmehmood.camerak.ocr/OcrPlugin.recognize|recognize(dev.kashifmehmood.camerak.capture.CapturedImage;dev.kashifmehmood.camerak.ocr.OcrLevel){}[0]
+}
+
+final class dev.kashifmehmood.camerak.ocr/RecognizedText { // dev.kashifmehmood.camerak.ocr/RecognizedText|null[0]
+    constructor <init>(kotlin/String, kotlin.collections/List<dev.kashifmehmood.camerak.ocr/TextBlock>, kotlin/Long) // dev.kashifmehmood.camerak.ocr/RecognizedText.<init>|<init>(kotlin.String;kotlin.collections.List<dev.kashifmehmood.camerak.ocr.TextBlock>;kotlin.Long){}[0]
+
+    final val blocks // dev.kashifmehmood.camerak.ocr/RecognizedText.blocks|{}blocks[0]
+        final fun <get-blocks>(): kotlin.collections/List<dev.kashifmehmood.camerak.ocr/TextBlock> // dev.kashifmehmood.camerak.ocr/RecognizedText.blocks.<get-blocks>|<get-blocks>(){}[0]
+    final val text // dev.kashifmehmood.camerak.ocr/RecognizedText.text|{}text[0]
+        final fun <get-text>(): kotlin/String // dev.kashifmehmood.camerak.ocr/RecognizedText.text.<get-text>|<get-text>(){}[0]
+    final val timestampNanos // dev.kashifmehmood.camerak.ocr/RecognizedText.timestampNanos|{}timestampNanos[0]
+        final fun <get-timestampNanos>(): kotlin/Long // dev.kashifmehmood.camerak.ocr/RecognizedText.timestampNanos.<get-timestampNanos>|<get-timestampNanos>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // dev.kashifmehmood.camerak.ocr/RecognizedText.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // dev.kashifmehmood.camerak.ocr/RecognizedText.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // dev.kashifmehmood.camerak.ocr/RecognizedText.toString|toString(){}[0]
+}
+
+final class dev.kashifmehmood.camerak.ocr/TextBlock { // dev.kashifmehmood.camerak.ocr/TextBlock|null[0]
+    constructor <init>(kotlin/String, dev.kashifmehmood.camerak.frames/FrameRect?, kotlin/Float?) // dev.kashifmehmood.camerak.ocr/TextBlock.<init>|<init>(kotlin.String;dev.kashifmehmood.camerak.frames.FrameRect?;kotlin.Float?){}[0]
+
+    final val bounds // dev.kashifmehmood.camerak.ocr/TextBlock.bounds|{}bounds[0]
+        final fun <get-bounds>(): dev.kashifmehmood.camerak.frames/FrameRect? // dev.kashifmehmood.camerak.ocr/TextBlock.bounds.<get-bounds>|<get-bounds>(){}[0]
+    final val confidence // dev.kashifmehmood.camerak.ocr/TextBlock.confidence|{}confidence[0]
+        final fun <get-confidence>(): kotlin/Float? // dev.kashifmehmood.camerak.ocr/TextBlock.confidence.<get-confidence>|<get-confidence>(){}[0]
+    final val text // dev.kashifmehmood.camerak.ocr/TextBlock.text|{}text[0]
+        final fun <get-text>(): kotlin/String // dev.kashifmehmood.camerak.ocr/TextBlock.text.<get-text>|<get-text>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // dev.kashifmehmood.camerak.ocr/TextBlock.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // dev.kashifmehmood.camerak.ocr/TextBlock.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // dev.kashifmehmood.camerak.ocr/TextBlock.toString|toString(){}[0]
+}
+
+final value class dev.kashifmehmood.camerak.ocr/OcrLevel { // dev.kashifmehmood.camerak.ocr/OcrLevel|null[0]
+    final val name // dev.kashifmehmood.camerak.ocr/OcrLevel.name|{}name[0]
+        final fun <get-name>(): kotlin/String // dev.kashifmehmood.camerak.ocr/OcrLevel.name.<get-name>|<get-name>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // dev.kashifmehmood.camerak.ocr/OcrLevel.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // dev.kashifmehmood.camerak.ocr/OcrLevel.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // dev.kashifmehmood.camerak.ocr/OcrLevel.toString|toString(){}[0]
+
+    final object Companion { // dev.kashifmehmood.camerak.ocr/OcrLevel.Companion|null[0]
+        final val ACCURATE // dev.kashifmehmood.camerak.ocr/OcrLevel.Companion.ACCURATE|{}ACCURATE[0]
+            final fun <get-ACCURATE>(): dev.kashifmehmood.camerak.ocr/OcrLevel // dev.kashifmehmood.camerak.ocr/OcrLevel.Companion.ACCURATE.<get-ACCURATE>|<get-ACCURATE>(){}[0]
+        final val FAST // dev.kashifmehmood.camerak.ocr/OcrLevel.Companion.FAST|{}FAST[0]
+            final fun <get-FAST>(): dev.kashifmehmood.camerak.ocr/OcrLevel // dev.kashifmehmood.camerak.ocr/OcrLevel.Companion.FAST.<get-FAST>|<get-FAST>(){}[0]
+    }
+}
+
+final val dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_OcrConfig$stableprop // dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_OcrConfig$stableprop|#static{}dev_kashifmehmood_camerak_ocr_OcrConfig$stableprop[0]
+final val dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_OcrConfig_Builder$stableprop // dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_OcrConfig_Builder$stableprop|#static{}dev_kashifmehmood_camerak_ocr_OcrConfig_Builder$stableprop[0]
+final val dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_OcrPlugin$stableprop // dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_OcrPlugin$stableprop|#static{}dev_kashifmehmood_camerak_ocr_OcrPlugin$stableprop[0]
+final val dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_RecognizedText$stableprop // dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_RecognizedText$stableprop|#static{}dev_kashifmehmood_camerak_ocr_RecognizedText$stableprop[0]
+final val dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_TextBlock$stableprop // dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_TextBlock$stableprop|#static{}dev_kashifmehmood_camerak_ocr_TextBlock$stableprop[0]
+
+final fun dev.kashifmehmood.camerak.ocr/OcrConfig(kotlin/Function1<dev.kashifmehmood.camerak.ocr/OcrConfig.Builder, kotlin/Unit> = ...): dev.kashifmehmood.camerak.ocr/OcrConfig // dev.kashifmehmood.camerak.ocr/OcrConfig|OcrConfig(kotlin.Function1<dev.kashifmehmood.camerak.ocr.OcrConfig.Builder,kotlin.Unit>){}[0]
+final fun dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_OcrConfig$stableprop_getter(): kotlin/Int // dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_OcrConfig$stableprop_getter|dev_kashifmehmood_camerak_ocr_OcrConfig$stableprop_getter(){}[0]
+final fun dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_OcrConfig_Builder$stableprop_getter(): kotlin/Int // dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_OcrConfig_Builder$stableprop_getter|dev_kashifmehmood_camerak_ocr_OcrConfig_Builder$stableprop_getter(){}[0]
+final fun dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_OcrPlugin$stableprop_getter(): kotlin/Int // dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_OcrPlugin$stableprop_getter|dev_kashifmehmood_camerak_ocr_OcrPlugin$stableprop_getter(){}[0]
+final fun dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_RecognizedText$stableprop_getter(): kotlin/Int // dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_RecognizedText$stableprop_getter|dev_kashifmehmood_camerak_ocr_RecognizedText$stableprop_getter(){}[0]
+final fun dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_TextBlock$stableprop_getter(): kotlin/Int // dev.kashifmehmood.camerak.ocr/dev_kashifmehmood_camerak_ocr_TextBlock$stableprop_getter|dev_kashifmehmood_camerak_ocr_TextBlock$stableprop_getter(){}[0]
+final fun dev.kashifmehmood.camerak.ocr/rememberOcrPlugin(dev.kashifmehmood.camerak.ocr/OcrConfig?, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): dev.kashifmehmood.camerak.ocr/OcrPlugin // dev.kashifmehmood.camerak.ocr/rememberOcrPlugin|rememberOcrPlugin(dev.kashifmehmood.camerak.ocr.OcrConfig?;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]

@@ -1,0 +1,80 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <dev.kashifmehmood:analyzerPlugin>
+final class dev.kashifmehmood.camerak.analyzer/AnalyzerConfig { // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig|null[0]
+    final val jpegQuality // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.jpegQuality|{}jpegQuality[0]
+        final fun <get-jpegQuality>(): kotlin/Int // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.jpegQuality.<get-jpegQuality>|<get-jpegQuality>(){}[0]
+    final val maxDimension // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.maxDimension|{}maxDimension[0]
+        final fun <get-maxDimension>(): kotlin/Int? // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.maxDimension.<get-maxDimension>|<get-maxDimension>(){}[0]
+    final val maxFps // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.maxFps|{}maxFps[0]
+        final fun <get-maxFps>(): kotlin/Float // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.maxFps.<get-maxFps>|<get-maxFps>(){}[0]
+
+    final fun copy(kotlin/Function1<dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.Builder, kotlin/Unit>): dev.kashifmehmood.camerak.analyzer/AnalyzerConfig // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.copy|copy(kotlin.Function1<dev.kashifmehmood.camerak.analyzer.AnalyzerConfig.Builder,kotlin.Unit>){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.toString|toString(){}[0]
+
+    final class Builder { // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.Builder|null[0]
+        final var jpegQuality // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.Builder.jpegQuality|{}jpegQuality[0]
+            final fun <get-jpegQuality>(): kotlin/Int // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.Builder.jpegQuality.<get-jpegQuality>|<get-jpegQuality>(){}[0]
+            final fun <set-jpegQuality>(kotlin/Int) // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.Builder.jpegQuality.<set-jpegQuality>|<set-jpegQuality>(kotlin.Int){}[0]
+        final var maxDimension // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.Builder.maxDimension|{}maxDimension[0]
+            final fun <get-maxDimension>(): kotlin/Int? // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.Builder.maxDimension.<get-maxDimension>|<get-maxDimension>(){}[0]
+            final fun <set-maxDimension>(kotlin/Int?) // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.Builder.maxDimension.<set-maxDimension>|<set-maxDimension>(kotlin.Int?){}[0]
+        final var maxFps // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.Builder.maxFps|{}maxFps[0]
+            final fun <get-maxFps>(): kotlin/Float // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.Builder.maxFps.<get-maxFps>|<get-maxFps>(){}[0]
+            final fun <set-maxFps>(kotlin/Float) // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.Builder.maxFps.<set-maxFps>|<set-maxFps>(kotlin.Float){}[0]
+    }
+}
+
+final class dev.kashifmehmood.camerak.analyzer/AnalyzerPlugin : dev.kashifmehmood.camerak.state/CameraKPlugin { // dev.kashifmehmood.camerak.analyzer/AnalyzerPlugin|null[0]
+    constructor <init>(dev.kashifmehmood.camerak.analyzer/AnalyzerConfig = ...) // dev.kashifmehmood.camerak.analyzer/AnalyzerPlugin.<init>|<init>(dev.kashifmehmood.camerak.analyzer.AnalyzerConfig){}[0]
+
+    final val config // dev.kashifmehmood.camerak.analyzer/AnalyzerPlugin.config|{}config[0]
+        final fun <get-config>(): dev.kashifmehmood.camerak.analyzer/AnalyzerConfig // dev.kashifmehmood.camerak.analyzer/AnalyzerPlugin.config.<get-config>|<get-config>(){}[0]
+    final val results // dev.kashifmehmood.camerak.analyzer/AnalyzerPlugin.results|{}results[0]
+        final fun <get-results>(): kotlinx.coroutines.flow/Flow<dev.kashifmehmood.camerak.analyzer/EncodedFrame> // dev.kashifmehmood.camerak.analyzer/AnalyzerPlugin.results.<get-results>|<get-results>(){}[0]
+    final val status // dev.kashifmehmood.camerak.analyzer/AnalyzerPlugin.status|{}status[0]
+        final fun <get-status>(): kotlinx.coroutines.flow/StateFlow<dev.kashifmehmood.camerak.plugin/PluginStatus> // dev.kashifmehmood.camerak.analyzer/AnalyzerPlugin.status.<get-status>|<get-status>(){}[0]
+
+    final fun onAttach(dev.kashifmehmood.camerak.plugin/CameraKPluginContext) // dev.kashifmehmood.camerak.analyzer/AnalyzerPlugin.onAttach|onAttach(dev.kashifmehmood.camerak.plugin.CameraKPluginContext){}[0]
+    final fun onDetach() // dev.kashifmehmood.camerak.analyzer/AnalyzerPlugin.onDetach|onDetach(){}[0]
+    final fun pause() // dev.kashifmehmood.camerak.analyzer/AnalyzerPlugin.pause|pause(){}[0]
+    final fun resume() // dev.kashifmehmood.camerak.analyzer/AnalyzerPlugin.resume|resume(){}[0]
+}
+
+final class dev.kashifmehmood.camerak.analyzer/EncodedFrame { // dev.kashifmehmood.camerak.analyzer/EncodedFrame|null[0]
+    constructor <init>(kotlin/ByteArray, kotlin/Int, kotlin/Int, kotlin/Int, kotlin/Long) // dev.kashifmehmood.camerak.analyzer/EncodedFrame.<init>|<init>(kotlin.ByteArray;kotlin.Int;kotlin.Int;kotlin.Int;kotlin.Long){}[0]
+
+    final val bytes // dev.kashifmehmood.camerak.analyzer/EncodedFrame.bytes|{}bytes[0]
+        final fun <get-bytes>(): kotlin/ByteArray // dev.kashifmehmood.camerak.analyzer/EncodedFrame.bytes.<get-bytes>|<get-bytes>(){}[0]
+    final val height // dev.kashifmehmood.camerak.analyzer/EncodedFrame.height|{}height[0]
+        final fun <get-height>(): kotlin/Int // dev.kashifmehmood.camerak.analyzer/EncodedFrame.height.<get-height>|<get-height>(){}[0]
+    final val rotationDegrees // dev.kashifmehmood.camerak.analyzer/EncodedFrame.rotationDegrees|{}rotationDegrees[0]
+        final fun <get-rotationDegrees>(): kotlin/Int // dev.kashifmehmood.camerak.analyzer/EncodedFrame.rotationDegrees.<get-rotationDegrees>|<get-rotationDegrees>(){}[0]
+    final val timestampNanos // dev.kashifmehmood.camerak.analyzer/EncodedFrame.timestampNanos|{}timestampNanos[0]
+        final fun <get-timestampNanos>(): kotlin/Long // dev.kashifmehmood.camerak.analyzer/EncodedFrame.timestampNanos.<get-timestampNanos>|<get-timestampNanos>(){}[0]
+    final val width // dev.kashifmehmood.camerak.analyzer/EncodedFrame.width|{}width[0]
+        final fun <get-width>(): kotlin/Int // dev.kashifmehmood.camerak.analyzer/EncodedFrame.width.<get-width>|<get-width>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // dev.kashifmehmood.camerak.analyzer/EncodedFrame.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // dev.kashifmehmood.camerak.analyzer/EncodedFrame.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // dev.kashifmehmood.camerak.analyzer/EncodedFrame.toString|toString(){}[0]
+}
+
+final val dev.kashifmehmood.camerak.analyzer/dev_kashifmehmood_camerak_analyzer_AnalyzerConfig$stableprop // dev.kashifmehmood.camerak.analyzer/dev_kashifmehmood_camerak_analyzer_AnalyzerConfig$stableprop|#static{}dev_kashifmehmood_camerak_analyzer_AnalyzerConfig$stableprop[0]
+final val dev.kashifmehmood.camerak.analyzer/dev_kashifmehmood_camerak_analyzer_AnalyzerConfig_Builder$stableprop // dev.kashifmehmood.camerak.analyzer/dev_kashifmehmood_camerak_analyzer_AnalyzerConfig_Builder$stableprop|#static{}dev_kashifmehmood_camerak_analyzer_AnalyzerConfig_Builder$stableprop[0]
+final val dev.kashifmehmood.camerak.analyzer/dev_kashifmehmood_camerak_analyzer_AnalyzerPlugin$stableprop // dev.kashifmehmood.camerak.analyzer/dev_kashifmehmood_camerak_analyzer_AnalyzerPlugin$stableprop|#static{}dev_kashifmehmood_camerak_analyzer_AnalyzerPlugin$stableprop[0]
+final val dev.kashifmehmood.camerak.analyzer/dev_kashifmehmood_camerak_analyzer_EncodedFrame$stableprop // dev.kashifmehmood.camerak.analyzer/dev_kashifmehmood_camerak_analyzer_EncodedFrame$stableprop|#static{}dev_kashifmehmood_camerak_analyzer_EncodedFrame$stableprop[0]
+
+final fun dev.kashifmehmood.camerak.analyzer/AnalyzerConfig(kotlin/Function1<dev.kashifmehmood.camerak.analyzer/AnalyzerConfig.Builder, kotlin/Unit> = ...): dev.kashifmehmood.camerak.analyzer/AnalyzerConfig // dev.kashifmehmood.camerak.analyzer/AnalyzerConfig|AnalyzerConfig(kotlin.Function1<dev.kashifmehmood.camerak.analyzer.AnalyzerConfig.Builder,kotlin.Unit>){}[0]
+final fun dev.kashifmehmood.camerak.analyzer/dev_kashifmehmood_camerak_analyzer_AnalyzerConfig$stableprop_getter(): kotlin/Int // dev.kashifmehmood.camerak.analyzer/dev_kashifmehmood_camerak_analyzer_AnalyzerConfig$stableprop_getter|dev_kashifmehmood_camerak_analyzer_AnalyzerConfig$stableprop_getter(){}[0]
+final fun dev.kashifmehmood.camerak.analyzer/dev_kashifmehmood_camerak_analyzer_AnalyzerConfig_Builder$stableprop_getter(): kotlin/Int // dev.kashifmehmood.camerak.analyzer/dev_kashifmehmood_camerak_analyzer_AnalyzerConfig_Builder$stableprop_getter|dev_kashifmehmood_camerak_analyzer_AnalyzerConfig_Builder$stableprop_getter(){}[0]
+final fun dev.kashifmehmood.camerak.analyzer/dev_kashifmehmood_camerak_analyzer_AnalyzerPlugin$stableprop_getter(): kotlin/Int // dev.kashifmehmood.camerak.analyzer/dev_kashifmehmood_camerak_analyzer_AnalyzerPlugin$stableprop_getter|dev_kashifmehmood_camerak_analyzer_AnalyzerPlugin$stableprop_getter(){}[0]
+final fun dev.kashifmehmood.camerak.analyzer/dev_kashifmehmood_camerak_analyzer_EncodedFrame$stableprop_getter(): kotlin/Int // dev.kashifmehmood.camerak.analyzer/dev_kashifmehmood_camerak_analyzer_EncodedFrame$stableprop_getter|dev_kashifmehmood_camerak_analyzer_EncodedFrame$stableprop_getter(){}[0]
+final fun dev.kashifmehmood.camerak.analyzer/rememberAnalyzerPlugin(dev.kashifmehmood.camerak.analyzer/AnalyzerConfig?, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): dev.kashifmehmood.camerak.analyzer/AnalyzerPlugin // dev.kashifmehmood.camerak.analyzer/rememberAnalyzerPlugin|rememberAnalyzerPlugin(dev.kashifmehmood.camerak.analyzer.AnalyzerConfig?;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]

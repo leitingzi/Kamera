@@ -1,41 +1,18 @@
-import com.vanniktech.maven.publish.SonatypeHost
-import org.jetbrains.compose.compose
-
 plugins {
-    alias(libs.plugins.multiplatform)
-    alias(libs.plugins.android.library)
-    id("org.jetbrains.compose")
+    id("camerak.kmp-library")
+    alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
-    id("com.vanniktech.maven.publish") version "0.31.0"
-    alias(libs.plugins.dokka)
+    id("camerak.publish")
+    alias(libs.plugins.poko)
 }
 
-group = "com.kashif.ocr_plugin"
-version = "1.2"
-
 kotlin {
-    jvmToolchain(17)
-    androidTarget {
-        publishLibraryVariants("release", "debug")
-    }
-
-    jvm("desktop")
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64(),
-    ).forEach {
-        it.binaries.framework {
-            baseName = "ocrPlugin"
-            isStatic = true
-        }
-    }
-
     sourceSets {
         val desktopMain by getting {
             dependencies {
-                implementation(libs.javacv.platform)
-                implementation(libs.tesseract.platform)
+                // Java bindings only; the app adds the Tesseract and Leptonica natives it ships.
+                implementation(libs.tesseract)
+                implementation(libs.leptonica)
             }
         }
 
@@ -44,78 +21,70 @@ kotlin {
             implementation(libs.atomicfu)
         }
 
+        val desktopTest by getting {
+            dependencies {
+                // TessdataLocatorTest finds the model in the tessdata artifact's jar.
+                implementation(projects.ocrTessdata)
+            }
+        }
+
         commonTest.dependencies {
             implementation(kotlin("test"))
+            implementation(projects.cameraKTesting)
+
+            // Test-only, and it must stay that way. On the runtime classpath, coroutines-test
+            // installs TestMainDispatcherFactory via ServiceLoader, which takes over
+            // Dispatchers.Main and then throws "Dispatchers.Main was accessed when the platform
+            // dispatcher was absent and the test dispatcher was unset" in consumer apps that never
+            // call Dispatchers.setMain(). See issue #165.
+            implementation(libs.kotlinx.coroutines.test)
+        }
+
+        androidUnitTest.dependencies {
+            implementation(libs.junit)
+            implementation(libs.robolectric)
+            implementation(libs.androidx.test.core)
         }
 
         androidMain.dependencies {
             implementation(libs.text.recognition)
         }
     }
+}
 
-    // https://kotlinlang.org/docs/native_objc_interop.html#export_of_kdoc_comments_to_generated_objective_c_headers
-//    targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget> {
-//        compilations["main"].compilerOptions.options.freeCompilerArgs.add("_Xexport_kdoc")
-//    }
+// One desktop test runs the real Tesseract, so the tests need this machine's natives.
+dependencies {
+    val javacppPlatform = rootProject.extra["javacppPlatform"] as String
+    val desktopTestRuntimeOnly = kotlin.sourceSets.getByName("desktopTest").runtimeOnlyConfigurationName
+    listOf(libs.javacpp, libs.tesseract, libs.leptonica).forEach {
+        add(desktopTestRuntimeOnly, variantOf(it) { classifier(javacppPlatform) })
+    }
+}
+
+// Desktop tests run in a working directory of their own, so a test can plant files there and show
+// that OCR never reads them. The real-Tesseract test finds the model through ocr.tessdataDir.
+tasks.named<Test>("desktopTest") {
+    val testWorkingDir =
+        layout.buildDirectory
+            .dir("desktopTest-cwd")
+            .get()
+            .asFile
+    workingDir = testWorkingDir
+    doFirst { testWorkingDir.mkdirs() }
+    systemProperty(
+        "ocr.tessdataDir",
+        rootProject.file("ocrTessdata/src/main/resources/dev/kashifmehmood/camerak/ocr/tessdata").absolutePath,
+    )
 }
 
 android {
-    namespace = "com.kashif.ocr_plugin"
-    compileSdk = 35
-
-    defaultConfig {
-        minSdk = 21
-    }
-
-    publishing {
-        singleVariant("release") {
-            withJavadocJar()
-            withSourcesJar()
-        }
-
-        // For debug variant, we exclude Javadoc and sources to prevent conflicts
-        singleVariant("debug") {
-            // Exclude Javadoc and sources JARs for debug variant
-        }
-    }
+    namespace = "dev.kashifmehmood.camerak.ocr"
 }
 
-mavenPublishing {
-    coordinates(
-        groupId = "io.github.kashif-mehmood-km",
-        artifactId = "ocr_plugin",
-        version = "1.2",
-    )
-
-    pom {
-        name.set("qrScannerPlugin")
-        description.set("Image Saver Plugin for CameraK")
-        inceptionYear.set("2024")
-        url.set("https://github.com/kashif-e/CameraK")
-
-        licenses {
-            license {
-                name.set("MIT")
-                url.set("https://opensource.org/licenses/MIT")
-            }
-        }
-
-        developers {
-            developer {
-                id.set("Kashif-E")
-                name.set("Kashif")
-                email.set("kashismails@gmail.com")
-            }
-        }
-
-        scm {
-            url.set("https://github.com/kashif-e/CameraK")
-        }
+// The @sample functions the KDoc names. Only commonMain gets them: Dokka refuses two source sets that
+// share a sample root, and every Android source set would.
+dokka {
+    dokkaSourceSets.named("commonMain") {
+        samples.from("src/commonTest/kotlin")
     }
-
-    // Configure publishing to Maven Central
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-
-    // Enable GPG signing for all publications
-    signAllPublications()
 }

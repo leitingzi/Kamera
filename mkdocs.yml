@@ -9,7 +9,7 @@ edit_uri: edit/main/docs/
 theme:
   name: material
   logo: assets/cameraklogo.png
-  favicon: assets/favicon.ico
+  favicon: assets/cameraklogo.png
   language: en
   palette:
     - media: "(prefers-color-scheme: light)"
@@ -67,18 +67,21 @@ nav:
     - Camera Capture: guides/camera-capture.md
     - Flash and Torch: guides/flash-and-torch.md
     - Zoom Control: guides/zoom-control.md
+    - Focus and Exposure: guides/focus-and-exposure.md
     - Camera Switching: guides/camera-switching.md
     - Video Recording: guides/video-recording.md
     - Plugins: guides/plugins.md
     - Web Camera: guides/web-camera.md
+    - Testing: guides/testing.md
   - API Reference:
     - CameraKStateHolder: api/state-holder.md
-    - CameraController: api/controller.md
-    - CameraKScreen: api/camera-k-screen.md
+    - CameraKScreen and CameraPreview: api/camera-k-screen.md
   - Examples:
     - Android: examples/android.md
     - Web: examples/web.md
+  - Migrating to 2.0: migration/2.0.md
   - Troubleshooting: troubleshooting.md
+  - Device Checklist: device-checklist.md
   - Contributing: contributing.md
   - License: license.md
 
@@ -87,7 +90,7 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/kashif-e/Kamera
       name: GitHub
-  version: 1.0
+  version: 2.0
 
 extra_css:
   - stylesheets/extra.css

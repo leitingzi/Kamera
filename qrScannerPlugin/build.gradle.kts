@@ -1,120 +1,66 @@
-import com.vanniktech.maven.publish.SonatypeHost
-import org.jetbrains.compose.compose
-
 plugins {
-    alias(libs.plugins.multiplatform)
-    alias(libs.plugins.android.library)
-    id("org.jetbrains.compose")
+    id("camerak.kmp-library")
+    alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
-    id("com.vanniktech.maven.publish") version "0.31.0"
-    alias(libs.plugins.dokka)
+    id("camerak.publish")
 }
 
-group = "com.kashif.qr_scanner_plugin"
-version = "1.2"
-
 kotlin {
-    jvmToolchain(17)
-    androidTarget {
-        publishLibraryVariants("release", "debug")
-    }
-
-    jvm("desktop")
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64(),
-    ).forEach {
-        it.binaries.framework {
-            baseName = "qrScannerPlugin"
-            isStatic = true
+    // Android and desktop share one ZXing decoder: jvmMain sits between commonMain and the two JVM targets.
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
+    applyDefaultHierarchyTemplate {
+        common {
+            group("jvm") {
+                withAndroidTarget()
+                withJvm()
+            }
         }
     }
 
     sourceSets {
-        val desktopMain by getting {
+        val jvmMain by getting {
             dependencies {
-                implementation(libs.javase)
-                implementation(libs.core.v351)
+                implementation(libs.zxing.core)
+            }
+        }
+
+        // javase renders the test images. It stays off desktopMain, where checkPublishedClasspath forbids it.
+        val desktopTest by getting {
+            dependencies {
+                implementation(libs.zxing.javase)
             }
         }
 
         commonMain.dependencies {
             api(projects.cameraK)
-            implementation(libs.atomicfu)
         }
 
         commonTest.dependencies {
             implementation(kotlin("test"))
+            implementation(projects.cameraKTesting)
+
+            // Test-only, and it must stay that way. On the runtime classpath, coroutines-test
+            // installs TestMainDispatcherFactory via ServiceLoader, which takes over
+            // Dispatchers.Main and then throws "Dispatchers.Main was accessed when the platform
+            // dispatcher was absent and the test dispatcher was unset" in consumer apps that never
+            // call Dispatchers.setMain(). See issue #165.
+            implementation(libs.kotlinx.coroutines.test)
         }
 
-        androidMain.dependencies {
+        androidUnitTest.dependencies {
+            implementation(libs.junit)
         }
     }
-
-    // https://kotlinlang.org/docs/native_objc_interop.html#export_of_kdoc_comments_to_generated_objective_c_headers
-//    targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget> {
-//        compilations["main"].compilerOptions.options.freeCompilerArgs.add("_Xexport_kdoc")
-//    }
 }
 
 android {
-    namespace = "com.kashif.qr_scanner_plugin"
-    compileSdk = 35
-
-    defaultConfig {
-        minSdk = 21
-    }
-
-    publishing {
-        singleVariant("release") {
-            withJavadocJar()
-            withSourcesJar()
-        }
-
-        // For debug variant, we exclude Javadoc and sources to prevent conflicts
-        singleVariant("debug") {
-            // Exclude Javadoc and sources JARs for debug variant
-        }
-    }
+    namespace = "dev.kashifmehmood.camerak.qrscanner"
 }
 
-mavenPublishing {
-    coordinates(
-        groupId = "io.github.kashif-mehmood-km",
-        artifactId = "qr_scanner_plugin",
-        version = "1.2",
-    )
-
-    pom {
-        name.set("qrScannerPlugin")
-        description.set("Image Saver Plugin for CameraK")
-        inceptionYear.set("2024")
-        url.set("https://github.com/kashif-e/CameraK")
-
-        licenses {
-            license {
-                name.set("MIT")
-                url.set("https://opensource.org/licenses/MIT")
-            }
-        }
-
-        developers {
-            developer {
-                id.set("Kashif-E")
-                name.set("Kashif")
-                email.set("kashismails@gmail.com")
-            }
-        }
-
-        scm {
-            url.set("https://github.com/kashif-e/CameraK")
-        }
+// The @sample functions the KDoc names. Only commonMain gets them: Dokka refuses two source sets that
+// share a sample root, and every Android source set would.
+dokka {
+    dokkaSourceSets.named("commonMain") {
+        samples.from("src/commonTest/kotlin")
     }
-
-    // Configure publishing to Maven Central
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-
-    // Enable GPG signing for all publications
-    signAllPublications()
 }

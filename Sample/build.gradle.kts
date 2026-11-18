@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.compose.compiler)
-    id("org.jetbrains.compose")
+    alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.android.application)
 }
 
@@ -18,7 +18,6 @@ kotlin {
 
     jvm("desktop")
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64(),
     ).forEach {
@@ -31,9 +30,12 @@ kotlin {
     applyDefaultHierarchyTemplate()
 
     sourceSets {
-        val desktopMain by getting
-
-        val mobileMain by creating
+        val desktopMain by getting {
+            dependencies {
+                // Tesseract's eng.traineddata, so desktop OCR finds it (see OcrConfig).
+                implementation(projects.ocrTessdata)
+            }
+        }
 
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -47,31 +49,27 @@ kotlin {
             implementation(projects.imageSaverPlugin)
             implementation(projects.qrScannerPlugin)
             implementation(projects.ocrPlugin)
-            implementation(projects.videoRecorderPlugin)
             implementation(libs.lucide.icons.cmp)
         }
 
-        mobileMain.dependsOn(commonMain.get())
-
-        mobileMain.dependencies {
-            implementation(libs.kflite)
-            implementation(libs.atomicfu)
-        }
-
         androidMain {
-            dependsOn(mobileMain)
             dependencies {
                 implementation(compose.uiTooling)
                 implementation(libs.androidx.activityCompose)
+                // BareCameraXActivity, the release gate's bare-CameraX baseline, and its trace section.
+                implementation(libs.camera.camera2)
+                implementation(libs.camera.lifecycle)
+                implementation(libs.androidx.camera.view)
+                implementation(libs.androidx.tracing)
+                implementation(libs.atomicfu)
             }
-        }
-
-        iosMain {
-            dependsOn(mobileMain)
         }
 
         commonTest.dependencies {
             implementation(kotlin("test"))
+            implementation(libs.kotlinx.coroutines.test)
+            // The fake holder, for the tests of the Sample's wiring to the 2.0 API.
+            implementation(projects.cameraKTesting)
             @OptIn(ExperimentalComposeLibrary::class)
             implementation(compose.uiTest)
         }
@@ -84,17 +82,29 @@ kotlin {
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+            // CameraK reads macOS's camera authorization and lists the cameras through JNA, which it
+            // declares compile-only; without it macOS offers only the default camera.
+            runtimeOnly(libs.jna)
         }
     }
 }
 
 android {
     namespace = "org.company.app"
-    compileSdk = 36
+    compileSdk =
+        libs.versions.android.compileSdk
+            .get()
+            .toInt()
 
     defaultConfig {
-        minSdk = 24
-        targetSdk = 34
+        minSdk =
+            libs.versions.android.minSdk
+                .get()
+                .toInt()
+        targetSdk =
+            libs.versions.android.compileSdk
+                .get()
+                .toInt()
 
         applicationId = "org.company.app.androidApp"
         versionCode = 1
@@ -102,10 +112,40 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    buildTypes {
+        // What :benchmark measures. Macrobenchmark refuses a debuggable app, so this is release,
+        // signed with the debug key so it installs, and profileable from the shell (the manifest).
+        create("benchmark") {
+            initWith(getByName("release"))
+            isDebuggable = false
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+        }
+    }
 }
 
-// https://developer.android.com/develop/ui/compose/testing#setup
+// The libraries ship only bytedeco's Java bindings, so the Sample adds the natives for the machine
+// building it: JavaCPP's JNI glue, FFmpeg (camera capture, through dshow on Windows, and recording),
+// Tesseract and Leptonica (OCR), and on Windows videoInput, the alternative Windows capture backend
+// the desktop engine keeps behind its seam.
 dependencies {
+    val javacppPlatform = rootProject.extra["javacppPlatform"] as String
+    val desktopRuntimeOnly = kotlin.sourceSets.getByName("desktopMain").runtimeOnlyConfigurationName
+    val natives =
+        listOf(libs.javacpp, libs.ffmpeg, libs.tesseract, libs.leptonica) +
+            if (javacppPlatform.startsWith("windows")) listOf(libs.videoinput) else emptyList()
+    natives.forEach { add(desktopRuntimeOnly, variantOf(it) { classifier(javacppPlatform) }) }
+}
+// BenchmarkSelectorsTest reads the release-gate benchmark's selectors (design §12.4 W13, Z-sample), so
+// a change to them reruns the Sample's tests.
+tasks.named<Test>("desktopTest") {
+    val benchmarkSources =
+        rootProject.layout.projectDirectory.dir(
+            "benchmark/src/main/kotlin/dev/kashifmehmood/camerak/benchmark",
+        )
+    inputs.dir(benchmarkSources).withPropertyName("benchmarkSources").withPathSensitivity(PathSensitivity.RELATIVE)
+    systemProperty("camerak.benchmarkSources", benchmarkSources.asFile.absolutePath)
 }
 tasks.named("embedAndSignAppleFrameworkForXcode") {
     doFirst {
@@ -123,6 +163,22 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "org.company.app"
             packageVersion = "1.0.0"
+
+            // Without a camera or microphone usage description TCC denies or kills a packaged macOS app
+            // that opens it; the entitlements let a signed, hardened-runtime build use them too.
+            macOS {
+                infoPlist {
+                    extraKeysRawXml =
+                        """
+                        <key>NSCameraUsageDescription</key>
+                        <string>The CameraK sample shows the camera preview and takes photos and videos.</string>
+                        <key>NSMicrophoneUsageDescription</key>
+                        <string>The CameraK sample records sound with videos that have audio turned on.</string>
+                        """.trimIndent()
+                }
+                entitlementsFile.set(project.file("macos/entitlements.plist"))
+                runtimeEntitlementsFile.set(project.file("macos/runtime-entitlements.plist"))
+            }
         }
 
         afterEvaluate {
@@ -135,6 +191,61 @@ compose.desktop {
                     jvmArgs("--add-opens", "java.desktop/sun.lwawt.macosx=ALL-UNNAMED")
                 }
             }
+        }
+    }
+}
+
+// A packaged macOS app that opens the camera without NSCameraUsageDescription in its Info.plist is
+// denied or killed by TCC, and a hardened-runtime build also needs the camera entitlement. The same
+// holds for the microphone a recording with audio opens: NSMicrophoneUsageDescription and the
+// audio-input entitlement.
+// `./gradlew run` hides both, because the terminal already holds the camera permission. The lint
+// target of scripts/verify.sh runs this check.
+// The DSL is read when the check runs, after the whole script has configured it, so the check does
+// not depend on where it is declared.
+val macOsPackaging = compose.desktop.application.nativeDistributions.macOS
+val macOsExtraPlistKeys =
+    provider {
+        var keys = ""
+        macOsPackaging.infoPlist { keys = extraKeysRawXml.orEmpty() }
+        keys
+    }
+val macOsEntitlementFiles =
+    provider {
+        listOfNotNull(
+            macOsPackaging.entitlementsFile.orNull?.asFile,
+            macOsPackaging.runtimeEntitlementsFile.orNull?.asFile,
+        )
+    }
+tasks.register("checkMacOsCameraPackaging") {
+    group = rootProject.extra["lintGroup"] as String
+    description =
+        "Fails if the packaged macOS app lacks the camera's or the microphone's usage description or entitlement"
+    inputs.property("extraKeysRawXml", macOsExtraPlistKeys)
+    inputs.files(macOsEntitlementFiles)
+    doLast {
+        val plistKeys = macOsExtraPlistKeys.get()
+        val entitlements = macOsEntitlementFiles.get()
+        val problems = mutableListOf<String>()
+        for (key in listOf("NSCameraUsageDescription", "NSMicrophoneUsageDescription")) {
+            val usage = Regex("""<key>$key</key>\s*<string>\s*[^<\s][^<]*</string>""")
+            if (!usage.containsMatchIn(plistKeys)) {
+                problems += "macOS { infoPlist { extraKeysRawXml } } has no non-empty $key"
+            }
+        }
+        if (entitlements.size < 2) {
+            problems += "macOS { entitlementsFile / runtimeEntitlementsFile } are not both set"
+        }
+        for (entitlement in listOf("com.apple.security.device.camera", "com.apple.security.device.audio-input")) {
+            val granted = Regex("""<key>${Regex.escape(entitlement)}</key>\s*<true\s*/>""")
+            entitlements.filterNot { it.isFile && granted.containsMatchIn(it.readText()) }.forEach {
+                problems += "${it.name} does not grant $entitlement"
+            }
+        }
+        if (problems.isNotEmpty()) {
+            throw GradleException(
+                "The macOS package cannot use the camera or the microphone:\n" + problems.joinToString("\n"),
+            )
         }
     }
 }

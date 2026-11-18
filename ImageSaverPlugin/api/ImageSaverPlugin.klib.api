@@ -1,0 +1,114 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <dev.kashifmehmood:ImageSaverPlugin>
+final enum class dev.kashifmehmood.camerak.mediasaver/GalleryDestination : kotlin/Enum<dev.kashifmehmood.camerak.mediasaver/GalleryDestination> { // dev.kashifmehmood.camerak.mediasaver/GalleryDestination|null[0]
+    enum entry DCIM // dev.kashifmehmood.camerak.mediasaver/GalleryDestination.DCIM|null[0]
+    enum entry DOCUMENTS // dev.kashifmehmood.camerak.mediasaver/GalleryDestination.DOCUMENTS|null[0]
+    enum entry PICTURES // dev.kashifmehmood.camerak.mediasaver/GalleryDestination.PICTURES|null[0]
+
+    final val entries // dev.kashifmehmood.camerak.mediasaver/GalleryDestination.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<dev.kashifmehmood.camerak.mediasaver/GalleryDestination> // dev.kashifmehmood.camerak.mediasaver/GalleryDestination.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): dev.kashifmehmood.camerak.mediasaver/GalleryDestination // dev.kashifmehmood.camerak.mediasaver/GalleryDestination.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<dev.kashifmehmood.camerak.mediasaver/GalleryDestination> // dev.kashifmehmood.camerak.mediasaver/GalleryDestination.values|values#static(){}[0]
+}
+
+final class dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig { // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig|null[0]
+    final val autoSave // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.autoSave|{}autoSave[0]
+        final fun <get-autoSave>(): kotlin/Boolean // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.autoSave.<get-autoSave>|<get-autoSave>(){}[0]
+    final val destination // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.destination|{}destination[0]
+        final fun <get-destination>(): dev.kashifmehmood.camerak.mediasaver/GalleryDestination // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.destination.<get-destination>|<get-destination>(){}[0]
+    final val folderName // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.folderName|{}folderName[0]
+        final fun <get-folderName>(): kotlin/String? // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.folderName.<get-folderName>|<get-folderName>(){}[0]
+    final val imageFormat // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.imageFormat|{}imageFormat[0]
+        final fun <get-imageFormat>(): dev.kashifmehmood.camerak.enums/ImageFormat // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.imageFormat.<get-imageFormat>|<get-imageFormat>(){}[0]
+    final val prefix // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.prefix|{}prefix[0]
+        final fun <get-prefix>(): kotlin/String? // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.prefix.<get-prefix>|<get-prefix>(){}[0]
+
+    final fun copy(kotlin/Function1<dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.Builder, kotlin/Unit>): dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.copy|copy(kotlin.Function1<dev.kashifmehmood.camerak.mediasaver.MediaSaverConfig.Builder,kotlin.Unit>){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.toString|toString(){}[0]
+
+    final class Builder { // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.Builder|null[0]
+        final var autoSave // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.Builder.autoSave|{}autoSave[0]
+            final fun <get-autoSave>(): kotlin/Boolean // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.Builder.autoSave.<get-autoSave>|<get-autoSave>(){}[0]
+            final fun <set-autoSave>(kotlin/Boolean) // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.Builder.autoSave.<set-autoSave>|<set-autoSave>(kotlin.Boolean){}[0]
+        final var destination // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.Builder.destination|{}destination[0]
+            final fun <get-destination>(): dev.kashifmehmood.camerak.mediasaver/GalleryDestination // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.Builder.destination.<get-destination>|<get-destination>(){}[0]
+            final fun <set-destination>(dev.kashifmehmood.camerak.mediasaver/GalleryDestination) // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.Builder.destination.<set-destination>|<set-destination>(dev.kashifmehmood.camerak.mediasaver.GalleryDestination){}[0]
+        final var folderName // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.Builder.folderName|{}folderName[0]
+            final fun <get-folderName>(): kotlin/String? // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.Builder.folderName.<get-folderName>|<get-folderName>(){}[0]
+            final fun <set-folderName>(kotlin/String?) // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.Builder.folderName.<set-folderName>|<set-folderName>(kotlin.String?){}[0]
+        final var imageFormat // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.Builder.imageFormat|{}imageFormat[0]
+            final fun <get-imageFormat>(): dev.kashifmehmood.camerak.enums/ImageFormat // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.Builder.imageFormat.<get-imageFormat>|<get-imageFormat>(){}[0]
+            final fun <set-imageFormat>(dev.kashifmehmood.camerak.enums/ImageFormat) // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.Builder.imageFormat.<set-imageFormat>|<set-imageFormat>(dev.kashifmehmood.camerak.enums.ImageFormat){}[0]
+        final var prefix // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.Builder.prefix|{}prefix[0]
+            final fun <get-prefix>(): kotlin/String? // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.Builder.prefix.<get-prefix>|<get-prefix>(){}[0]
+            final fun <set-prefix>(kotlin/String?) // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.Builder.prefix.<set-prefix>|<set-prefix>(kotlin.String?){}[0]
+    }
+}
+
+final class dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin : dev.kashifmehmood.camerak.state/CameraKPlugin { // dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin|null[0]
+    constructor <init>(dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig, dev.kashifmehmood.camerak.platform/CameraKPlatformContext) // dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin.<init>|<init>(dev.kashifmehmood.camerak.mediasaver.MediaSaverConfig;dev.kashifmehmood.camerak.platform.CameraKPlatformContext){}[0]
+
+    final val config // dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin.config|{}config[0]
+        final fun <get-config>(): dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig // dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin.config.<get-config>|<get-config>(){}[0]
+    final val galleryPermission // dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin.galleryPermission|{}galleryPermission[0]
+        final fun <get-galleryPermission>(): dev.kashifmehmood.camerak.permissions/CameraKPermission? // dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin.galleryPermission.<get-galleryPermission>|<get-galleryPermission>(){}[0]
+    final val needsFrames // dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin.needsFrames|{}needsFrames[0]
+        final fun <get-needsFrames>(): kotlin/Boolean // dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin.needsFrames.<get-needsFrames>|<get-needsFrames>(){}[0]
+    final val results // dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin.results|{}results[0]
+        final fun <get-results>(): kotlinx.coroutines.flow/Flow<dev.kashifmehmood.camerak.result/CameraKResult<dev.kashifmehmood.camerak.mediasaver/SavedImage>> // dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin.results.<get-results>|<get-results>(){}[0]
+    final val status // dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin.status|{}status[0]
+        final fun <get-status>(): kotlinx.coroutines.flow/StateFlow<dev.kashifmehmood.camerak.plugin/PluginStatus> // dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin.status.<get-status>|<get-status>(){}[0]
+
+    final fun getByteArrayFrom(kotlin/String): kotlin/ByteArray // dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin.getByteArrayFrom|getByteArrayFrom(kotlin.String){}[0]
+    final fun onAttach(dev.kashifmehmood.camerak.plugin/CameraKPluginContext) // dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin.onAttach|onAttach(dev.kashifmehmood.camerak.plugin.CameraKPluginContext){}[0]
+    final fun onDetach() // dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin.onDetach|onDetach(){}[0]
+    final suspend fun readBytes(dev.kashifmehmood.camerak.mediasaver/SavedImage): dev.kashifmehmood.camerak.result/CameraKResult<kotlin/ByteArray> // dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin.readBytes|readBytes(dev.kashifmehmood.camerak.mediasaver.SavedImage){}[0]
+    final suspend fun save(dev.kashifmehmood.camerak.capture/CapturedImage, kotlin/String? = ...): dev.kashifmehmood.camerak.result/CameraKResult<dev.kashifmehmood.camerak.mediasaver/SavedImage> // dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin.save|save(dev.kashifmehmood.camerak.capture.CapturedImage;kotlin.String?){}[0]
+    final suspend fun save(dev.kashifmehmood.camerak.capture/RecordedVideo, kotlin/String? = ...): dev.kashifmehmood.camerak.result/CameraKResult<dev.kashifmehmood.camerak.mediasaver/SavedVideo> // dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin.save|save(dev.kashifmehmood.camerak.capture.RecordedVideo;kotlin.String?){}[0]
+}
+
+final class dev.kashifmehmood.camerak.mediasaver/SavedImage { // dev.kashifmehmood.camerak.mediasaver/SavedImage|null[0]
+    final val asset // dev.kashifmehmood.camerak.mediasaver/SavedImage.asset|{}asset[0]
+        final fun <get-asset>(): dev.kashifmehmood.camerak.capture/GalleryAsset // dev.kashifmehmood.camerak.mediasaver/SavedImage.asset.<get-asset>|<get-asset>(){}[0]
+    final val displayName // dev.kashifmehmood.camerak.mediasaver/SavedImage.displayName|{}displayName[0]
+        final fun <get-displayName>(): kotlin/String // dev.kashifmehmood.camerak.mediasaver/SavedImage.displayName.<get-displayName>|<get-displayName>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // dev.kashifmehmood.camerak.mediasaver/SavedImage.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // dev.kashifmehmood.camerak.mediasaver/SavedImage.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // dev.kashifmehmood.camerak.mediasaver/SavedImage.toString|toString(){}[0]
+}
+
+final class dev.kashifmehmood.camerak.mediasaver/SavedVideo { // dev.kashifmehmood.camerak.mediasaver/SavedVideo|null[0]
+    final val asset // dev.kashifmehmood.camerak.mediasaver/SavedVideo.asset|{}asset[0]
+        final fun <get-asset>(): dev.kashifmehmood.camerak.capture/GalleryAsset // dev.kashifmehmood.camerak.mediasaver/SavedVideo.asset.<get-asset>|<get-asset>(){}[0]
+    final val displayName // dev.kashifmehmood.camerak.mediasaver/SavedVideo.displayName|{}displayName[0]
+        final fun <get-displayName>(): kotlin/String // dev.kashifmehmood.camerak.mediasaver/SavedVideo.displayName.<get-displayName>|<get-displayName>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // dev.kashifmehmood.camerak.mediasaver/SavedVideo.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // dev.kashifmehmood.camerak.mediasaver/SavedVideo.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // dev.kashifmehmood.camerak.mediasaver/SavedVideo.toString|toString(){}[0]
+}
+
+final val dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_MediaSaverConfig$stableprop // dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_MediaSaverConfig$stableprop|#static{}dev_kashifmehmood_camerak_mediasaver_MediaSaverConfig$stableprop[0]
+final val dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_MediaSaverConfig_Builder$stableprop // dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_MediaSaverConfig_Builder$stableprop|#static{}dev_kashifmehmood_camerak_mediasaver_MediaSaverConfig_Builder$stableprop[0]
+final val dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_MediaSaverPlugin$stableprop // dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_MediaSaverPlugin$stableprop|#static{}dev_kashifmehmood_camerak_mediasaver_MediaSaverPlugin$stableprop[0]
+final val dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_SavedImage$stableprop // dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_SavedImage$stableprop|#static{}dev_kashifmehmood_camerak_mediasaver_SavedImage$stableprop[0]
+final val dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_SavedVideo$stableprop // dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_SavedVideo$stableprop|#static{}dev_kashifmehmood_camerak_mediasaver_SavedVideo$stableprop[0]
+
+final fun com.kashif.imagesaverplugin/rememberImageSaverPlugin(dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig, androidx.compose.runtime/Composer?, kotlin/Int): dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin // com.kashif.imagesaverplugin/rememberImageSaverPlugin|rememberImageSaverPlugin(dev.kashifmehmood.camerak.mediasaver.MediaSaverConfig;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+final fun dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig(kotlin/Function1<dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig.Builder, kotlin/Unit> = ...): dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig // dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig|MediaSaverConfig(kotlin.Function1<dev.kashifmehmood.camerak.mediasaver.MediaSaverConfig.Builder,kotlin.Unit>){}[0]
+final fun dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_MediaSaverConfig$stableprop_getter(): kotlin/Int // dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_MediaSaverConfig$stableprop_getter|dev_kashifmehmood_camerak_mediasaver_MediaSaverConfig$stableprop_getter(){}[0]
+final fun dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_MediaSaverConfig_Builder$stableprop_getter(): kotlin/Int // dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_MediaSaverConfig_Builder$stableprop_getter|dev_kashifmehmood_camerak_mediasaver_MediaSaverConfig_Builder$stableprop_getter(){}[0]
+final fun dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_MediaSaverPlugin$stableprop_getter(): kotlin/Int // dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_MediaSaverPlugin$stableprop_getter|dev_kashifmehmood_camerak_mediasaver_MediaSaverPlugin$stableprop_getter(){}[0]
+final fun dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_SavedImage$stableprop_getter(): kotlin/Int // dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_SavedImage$stableprop_getter|dev_kashifmehmood_camerak_mediasaver_SavedImage$stableprop_getter(){}[0]
+final fun dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_SavedVideo$stableprop_getter(): kotlin/Int // dev.kashifmehmood.camerak.mediasaver/dev_kashifmehmood_camerak_mediasaver_SavedVideo$stableprop_getter|dev_kashifmehmood_camerak_mediasaver_SavedVideo$stableprop_getter(){}[0]
+final fun dev.kashifmehmood.camerak.mediasaver/rememberMediaSaverPlugin(dev.kashifmehmood.camerak.mediasaver/MediaSaverConfig, dev.kashifmehmood.camerak.platform/CameraKPlatformContext?, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): dev.kashifmehmood.camerak.mediasaver/MediaSaverPlugin // dev.kashifmehmood.camerak.mediasaver/rememberMediaSaverPlugin|rememberMediaSaverPlugin(dev.kashifmehmood.camerak.mediasaver.MediaSaverConfig;dev.kashifmehmood.camerak.platform.CameraKPlatformContext?;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]
